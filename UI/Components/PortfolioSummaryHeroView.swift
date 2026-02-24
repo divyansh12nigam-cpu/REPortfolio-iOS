@@ -51,8 +51,8 @@ struct PortfolioSummaryHeroView: View {
         .background(
             LinearGradient(
                 colors: [.insightBaseUltralight, .insightBaseLight],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
+                startPoint: .top,
+                endPoint: .bottom
             )
         )
     }

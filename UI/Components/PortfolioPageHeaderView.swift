@@ -44,6 +44,14 @@ struct PortfolioPageHeaderView: View {
         }
         .padding(.horizontal, Spacing.xxl)
         .padding(.vertical, Spacing.xl)
+        .frame(maxWidth: .infinity)
+        .background(Color.surfaceWhite.opacity(0.86))
+        .overlay(
+            Rectangle()
+                .frame(height: 0.5)
+                .foregroundColor(.borderSubtle),
+            alignment: .bottom
+        )
     }
 }
 

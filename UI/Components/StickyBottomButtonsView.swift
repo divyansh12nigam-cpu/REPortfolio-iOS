@@ -1,44 +1,33 @@
 import SwiftUI
 
 struct StickyBottomButtonsView: View {
-    var onContact: () -> Void = {}
-    var onCompare: () -> Void = {}
-
     var body: some View {
-        HStack(spacing: Spacing.xl) {
-            // "Compare" ghost button
-            Button(action: onCompare) {
-                Text("Compare")
+        VStack(spacing: Spacing.l) {
+            // Primary CTA — blue filled capsule
+            Button(action: {}) {
+                Text("Post for Sale/Rent — FREE")
                     .font(Typography.bodyMedium)
-                    .foregroundColor(.brandPrimary)
+                    .foregroundColor(.surfaceWhite.opacity(0.96))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Radius.element)
-                            .stroke(Color.brandPrimary, lineWidth: 1)
-                    )
+                    .frame(height: 44)
+                    .background(Color.brandPrimary)
+                    .clipShape(Capsule())
             }
 
-            // "Contact RE" filled button
-            Button(action: onContact) {
-                Text("Contact RE")
+            // Secondary CTA — accent tinted capsule
+            Button(action: {}) {
+                Text("Find properties for investment")
                     .font(Typography.bodyMedium)
-                    .foregroundColor(.surfaceWhite)
+                    .foregroundColor(.brandText)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-                    .background(Color.brandPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: Radius.element))
+                    .frame(height: 44)
+                    .background(Color.insightAccentBg)
+                    .clipShape(Capsule())
             }
         }
         .padding(.horizontal, Spacing.xxxl)
-        .padding(.vertical, Spacing.xxl)
-        .background(Color.surfaceWhite)
-        .overlay(
-            Rectangle()
-                .frame(height: 0.5)
-                .foregroundColor(.borderSubtle)
-            , alignment: .top
-        )
+        .padding(.top, Spacing.xl)
+        .padding(.bottom, Spacing.l)
     }
 }
 

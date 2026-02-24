@@ -69,7 +69,7 @@ struct PortfolioSummaryView: View {
             Button(action: onAddClick) {
                 HStack(spacing: Spacing.s) {
                     Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.brandPrimary)
                     Text("Add")
                         .font(Typography.bodyMedium)

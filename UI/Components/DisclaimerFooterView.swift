@@ -2,18 +2,26 @@ import SwiftUI
 
 struct DisclaimerFooterView: View {
     var body: some View {
-        HStack(alignment: .top, spacing: Spacing.xl) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 14))
-                .foregroundColor(.textSecondary)
+        VStack(spacing: Spacing.l) {
+            // Lock icon in a white circle with shadow
+            ZStack {
+                Circle()
+                    .fill(Color.surfaceWhite)
+                    .frame(width: 32, height: 32)
+                    .shadow(color: .shadowNeutralLow, radius: 4, x: 0, y: 2)
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.textPrimary)
+            }
 
-            Text("Your portfolio data is private and encrypted. RE protects all sensitive financial information and never shares it with third parties without your consent.")
+            Text("Your details are private and visible only to you.")
                 .font(Typography.bodyMediumThin)
-                .foregroundColor(.textSecondary)
+                .foregroundColor(.textPrimary.opacity(0.93))
         }
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, Spacing.xxxl)
-        .padding(.vertical, Spacing.xxl)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, Spacing.xxxl)
+        .padding(.bottom, Spacing.widgetsXs)
         .background(Color.surfaceAccentBase)
     }
 }

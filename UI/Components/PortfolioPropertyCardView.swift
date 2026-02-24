@@ -123,11 +123,11 @@ private struct InsightCardView: View {
     let onClick: () -> Void
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        VStack(spacing: 0) {
             CardBodyView(property: property, onClick: onClick)
                 .zIndex(2)
 
-            // Purple gradient strip — peeks behind card
+            // Purple gradient strip — peeks Spacing.xxl behind the card
             HStack {
                 HStack(spacing: Spacing.m) {
                     Image(systemName: "sparkles")
@@ -158,7 +158,7 @@ private struct InsightCardView: View {
                     bottomTrailingRadius: Radius.element
                 )
             )
-            .offset(y: Spacing.xxl)   // peeks behind card
+            .offset(y: -Spacing.xxl)   // pulls strip UP behind card
             .zIndex(1)
         }
     }
@@ -171,7 +171,7 @@ private struct InsightActionCardView: View {
     let onClick: () -> Void
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        VStack(spacing: 0) {
             CardBodyView(property: property, onClick: onClick)
                 .zIndex(2)
 
@@ -207,7 +207,7 @@ private struct InsightActionCardView: View {
                     bottomTrailingRadius: Radius.element
                 )
             )
-            .offset(y: Spacing.xxl)
+            .offset(y: -Spacing.xxl)   // pulls strip UP behind card
             .zIndex(1)
         }
     }
@@ -220,7 +220,7 @@ private struct AddPurchasePriceCardView: View {
     let onClick: () -> Void
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        VStack(spacing: 0) {
             CardBodyView(property: property, onClick: onClick)
                 .zIndex(2)
 
@@ -256,7 +256,7 @@ private struct AddPurchasePriceCardView: View {
                 )
                 .stroke(Color.purpleLight, lineWidth: 1)
             )
-            .offset(y: Spacing.l)    // smaller offset for this variant
+            .offset(y: -Spacing.l)   // pulls strip UP behind card
             .zIndex(1)
         }
     }
