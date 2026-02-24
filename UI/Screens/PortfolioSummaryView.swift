@@ -7,7 +7,7 @@ struct PortfolioSummaryView: View {
     @StateObject private var repository = PropertyRepository.shared
     @State private var summary    = SamplePortfolioData.summary
     @State private var properties = SamplePortfolioData.properties
-    @State private var isLoading  = true
+    @State private var isLoading  = false
 
     var body: some View {
         ScrollView {
@@ -44,19 +44,22 @@ struct PortfolioSummaryView: View {
         }
         .background(Color.surfaceWhite)
         .task(id: repository.propertyInputs.count) {
-            isLoading = true
-            defer { isLoading = false }
             let inputs = repository.propertyInputs
+            // Show locally-computed data immediately
+            summary    = SamplePortfolioData.summary(for: inputs)
+            properties = SamplePortfolioData.properties(for: inputs)
+            isLoading = false
+            // Then try API as an optional upgrade
             do {
                 let response = try await PortfolioApi.fetchSummary(inputs: inputs)
-                summary    = response.summary.toUiSummary()
-                properties = response.properties.enumerated().map { i, p in
-                    p.toUiProperty(variant: .plain)
+                if !Task.isCancelled {
+                    summary    = response.summary.toUiSummary()
+                    properties = response.properties.enumerated().map { i, p in
+                        p.toUiProperty(variant: .plain)
+                    }
                 }
             } catch {
-                // Compute locally from current repository inputs as fallback
-                summary    = SamplePortfolioData.summary(for: inputs)
-                properties = SamplePortfolioData.properties(for: inputs)
+                // Local data already shown above
             }
         }
     }
