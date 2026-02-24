@@ -48,8 +48,8 @@ enum SamplePortfolioData {
         let growth: Double
     }
 
-    private static var valuations: [Valuation] {
-        propertyInputs.map { p in
+    private static func valuations(for inputs: [PropertyInput]) -> [Valuation] {
+        inputs.map { p in
             let pricePerSqft = Double(cityBasePrice[p.city] ?? defaultBasePrice)
             let fair  = pricePerSqft * Double(p.areaSqft)
             let low   = fair * 0.95
@@ -59,10 +59,12 @@ enum SamplePortfolioData {
         }
     }
 
+    private static var valuations: [Valuation] { valuations(for: propertyInputs) }
+
     // ─── Properties list ──────────────────────────────────────────────────────
 
-    static var properties: [PortfolioProperty] {
-        valuations.enumerated().map { i, v in
+    static func properties(for inputs: [PropertyInput]) -> [PortfolioProperty] {
+        valuations(for: inputs).enumerated().map { i, v in
             let variant = i < variantPattern.count ? variantPattern[i] : .plain
             let insightText: String
             switch variant {
@@ -86,15 +88,17 @@ enum SamplePortfolioData {
         }
     }
 
+    static var properties: [PortfolioProperty] { properties(for: propertyInputs) }
+
     // ─── Computed summary ─────────────────────────────────────────────────────
 
-    static var summary: PortfolioSummary {
-        let vals = valuations
-        let totalInvested = Double(propertyInputs.reduce(0) { $0 + $1.purchasePrice })
+    static func summary(for inputs: [PropertyInput]) -> PortfolioSummary {
+        let vals = valuations(for: inputs)
+        let totalInvested = Double(inputs.reduce(0) { $0 + $1.purchasePrice })
         let totalHighValue = vals.reduce(0.0) { $0 + Formatters.roundToDisplayPrecision($1.highValue) }
         let totalGrowth = totalHighValue - totalInvested
         let growthPercent = totalInvested > 0 ? (totalGrowth / totalInvested) * 100 : 0.0
-        let totalAnnualRental = Double(propertyInputs.reduce(0) { $0 + $1.monthlyRent * 12 })
+        let totalAnnualRental = Double(inputs.reduce(0) { $0 + $1.monthlyRent * 12 })
 
         return PortfolioSummary(
             netWorth: Formatters.formatAmount(totalHighValue),
@@ -104,6 +108,8 @@ enum SamplePortfolioData {
             annualRental: Formatters.formatAmount(totalAnnualRental)
         )
     }
+
+    static var summary: PortfolioSummary { summary(for: propertyInputs) }
 
     // ─── Property detail (index 2 — Old Home in Vasundhra) ───────────────────
 

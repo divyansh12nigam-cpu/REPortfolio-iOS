@@ -46,14 +46,17 @@ struct PortfolioSummaryView: View {
         .task(id: repository.propertyInputs.count) {
             isLoading = true
             defer { isLoading = false }
+            let inputs = repository.propertyInputs
             do {
-                let response = try await PortfolioApi.fetchSummary(inputs: repository.propertyInputs)
+                let response = try await PortfolioApi.fetchSummary(inputs: inputs)
                 summary    = response.summary.toUiSummary()
                 properties = response.properties.enumerated().map { i, p in
                     p.toUiProperty(variant: .plain)
                 }
             } catch {
-                // Sample data remains as fallback
+                // Compute locally from current repository inputs as fallback
+                summary    = SamplePortfolioData.summary(for: inputs)
+                properties = SamplePortfolioData.properties(for: inputs)
             }
         }
     }
