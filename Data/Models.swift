@@ -53,6 +53,37 @@ struct PortfolioProperty: Identifiable {
     }
 }
 
+// ─── Onboarding enums + form state ──────────────────────────────────────────
+
+enum PropertyUsageType: String, CaseIterable {
+    case selfUse = "Self-use"
+    case rentLease = "Rent/lease"
+    case investment = "Investment"
+}
+
+enum FloorPlan: String, CaseIterable {
+    case bhk2 = "2 BHK"
+    case bhk3 = "3 BHK"
+    case bhk4 = "4 BHK"
+    case other = "Other"
+}
+
+struct OnboardingFormState {
+    // Step 1
+    var city: String = ""
+    var locality: String = ""
+    var societyName: String = ""
+    var floorPlan: FloorPlan? = nil
+    var areaSqft: String = ""
+    // Step 2
+    var usageType: PropertyUsageType? = nil
+    var purchasePrice: String = ""
+    var purchaseYear: String = ""
+    var purchaseMonth: String = ""
+    var monthlyRent: String = ""
+    var customName: String = ""
+}
+
 // ─── Property Detail ──────────────────────────────────────────────────────────
 
 struct PropertyDetail {

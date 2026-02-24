@@ -30,6 +30,13 @@ extension Color {
     // Borders & Shadows
     static let borderSubtle          = Color.black.opacity(0.1)
     static let shadowNeutralLow      = Color.black.opacity(0.06)
+
+    // Onboarding / Form
+    static let successGreen          = Color(hex: "218362")
+    static let errorRed              = Color(hex: "D32F2F")
+    static let formFieldBg           = Color(hex: "F4F5F7")
+    static let formFieldBorder       = Color(hex: "EBECF0")
+    static let successScreenBg       = Color(hex: "E8F5E9")
 }
 
 // Hex initialiser — allows Color(hex: "0069E0") from any file in this module

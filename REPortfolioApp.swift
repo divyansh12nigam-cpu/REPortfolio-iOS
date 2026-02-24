@@ -9,22 +9,39 @@ struct REPortfolioApp: App {
     }
 }
 
+enum AppScreen {
+    case portfolio
+    case propertyDetail
+    case addProperty
+}
+
 struct RootNavigationView: View {
-    @State private var showDetail = false
+    @State private var activeScreen: AppScreen = .portfolio
 
     var body: some View {
         ZStack {
-            PortfolioSummaryView(onPropertyTap: { showDetail = true })
+            PortfolioSummaryView(
+                onPropertyTap: { activeScreen = .propertyDetail },
+                onAddClick: { activeScreen = .addProperty }
+            )
 
-            if showDetail {
+            if activeScreen == .propertyDetail {
                 PropertyDetailView(
-                    onBack: { showDetail = false },
+                    onBack: { activeScreen = .portfolio },
                     detail: SamplePortfolioData.propertyDetail
                 )
                 .transition(.move(edge: .trailing))
             }
+
+            if activeScreen == .addProperty {
+                AddPropertyScreen(
+                    onComplete: { activeScreen = .portfolio },
+                    onBack: { activeScreen = .portfolio }
+                )
+                .transition(.move(edge: .trailing))
+            }
         }
-        .animation(.easeInOut(duration: 0.28), value: showDetail)
+        .animation(.easeInOut(duration: 0.28), value: activeScreen)
     }
 }
 

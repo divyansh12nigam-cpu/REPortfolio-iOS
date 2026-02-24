@@ -2,7 +2,9 @@ import SwiftUI
 
 struct PortfolioSummaryView: View {
     var onPropertyTap: () -> Void = {}
+    var onAddClick: () -> Void = {}
 
+    @StateObject private var repository = PropertyRepository.shared
     @State private var summary    = SamplePortfolioData.summary
     @State private var properties = SamplePortfolioData.properties
     @State private var isLoading  = true
@@ -41,10 +43,11 @@ struct PortfolioSummaryView: View {
             }
         }
         .background(Color.surfaceWhite)
-        .task {
+        .task(id: repository.propertyInputs.count) {
+            isLoading = true
             defer { isLoading = false }
             do {
-                let response = try await PortfolioApi.fetchSummary()
+                let response = try await PortfolioApi.fetchSummary(inputs: repository.propertyInputs)
                 summary    = response.summary.toUiSummary()
                 properties = response.properties.enumerated().map { i, p in
                     p.toUiProperty(variant: .plain)
@@ -63,19 +66,21 @@ struct PortfolioSummaryView: View {
                 .foregroundColor(.textPrimary)
             Spacer()
             // "+ Add" ghost pill button
-            HStack(spacing: Spacing.s) {
-                Image(systemName: "plus")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.brandPrimary)
-                Text("Add")
-                    .font(Typography.bodyMedium)
-                    .foregroundColor(.brandText)
+            Button(action: onAddClick) {
+                HStack(spacing: Spacing.s) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.brandPrimary)
+                    Text("Add")
+                        .font(Typography.bodyMedium)
+                        .foregroundColor(.brandText)
+                }
+                .padding(.horizontal, Spacing.xxl)
+                .frame(height: 36)
+                .overlay(
+                    Capsule().stroke(Color.borderSubtle, lineWidth: 1)
+                )
             }
-            .padding(.horizontal, Spacing.xxl)
-            .frame(height: 36)
-            .overlay(
-                Capsule().stroke(Color.borderSubtle, lineWidth: 1)
-            )
         }
         .padding(.horizontal, Spacing.xxxl)
         .padding(.top, Spacing.widgetsM)
