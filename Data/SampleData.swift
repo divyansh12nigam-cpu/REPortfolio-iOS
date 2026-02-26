@@ -2,7 +2,7 @@ import Foundation
 
 // ─── Property inputs (mirrors SamplePortfolioData.kt) ────────────────────────
 
-struct PropertyInput {
+struct PropertyInput: Codable {
     let projectName: String
     let city: String
     let locality: String
@@ -10,6 +10,28 @@ struct PropertyInput {
     let purchasePrice: Int64
     let purchaseYear: Int
     let monthlyRent: Int
+    // Round-trip fields for edit mode (defaults keep seed data unchanged)
+    var societyName: String = ""
+    var floorPlan: FloorPlan? = nil
+    var customName: String = ""
+    var purchaseMonth: String = ""
+    var usageType: PropertyUsageType? = nil
+
+    func toFormState() -> OnboardingFormState {
+        OnboardingFormState(
+            city: city,
+            locality: locality,
+            societyName: societyName,
+            floorPlan: floorPlan,
+            areaSqft: areaSqft > 0 ? "\(areaSqft)" : "",
+            usageType: usageType ?? (monthlyRent > 0 ? .rentLease : .selfUse),
+            purchasePrice: purchasePrice > 0 ? "\(purchasePrice)" : "",
+            purchaseYear: purchaseYear > 0 ? "\(purchaseYear)" : "",
+            purchaseMonth: purchaseMonth,
+            monthlyRent: monthlyRent > 0 ? "\(monthlyRent)" : "",
+            customName: customName
+        )
+    }
 }
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────
@@ -63,9 +85,13 @@ enum SamplePortfolioData {
 
     // ─── Properties list ──────────────────────────────────────────────────────
 
-    static func properties(for inputs: [PropertyInput]) -> [PortfolioProperty] {
+    static func properties(for inputs: [PropertyInput], newCount: Int = 0) -> [PortfolioProperty] {
         valuations(for: inputs).enumerated().map { i, v in
-            let variant = i < variantPattern.count ? variantPattern[i] : .plain
+            let isNew = i < newCount
+            let variant = isNew ? .plain : {
+                let seedIndex = i - newCount
+                return seedIndex < variantPattern.count ? variantPattern[seedIndex] : .plain
+            }()
             let insightText: String
             switch variant {
             case .insight:
@@ -83,7 +109,8 @@ enum SamplePortfolioData {
                 monthlyRental: Formatters.formatRent(Double(v.input.monthlyRent)),
                 cardVariant: variant,
                 insightText: insightText,
-                actionLabel: variant == .insightAction ? "Post now" : ""
+                actionLabel: variant == .insightAction ? "Post now" : "",
+                isNew: isNew
             )
         }
     }

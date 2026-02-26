@@ -3,11 +3,24 @@ import SwiftUI
 struct PortfolioSummaryView: View {
     var onPropertyTap: () -> Void = {}
     var onAddClick: () -> Void = {}
+    var onEditProperty: (Int) -> Void = { _ in }
 
     @StateObject private var repository = PropertyRepository.shared
-    @State private var summary    = SamplePortfolioData.summary
-    @State private var properties = SamplePortfolioData.properties
-    @State private var isLoading  = false
+    @State private var apiSummary: PortfolioSummary? = nil
+    @State private var apiProperties: [PortfolioProperty]? = nil
+    @State private var propertyToDeleteIndex: Int? = nil
+
+    /// Always derived from the latest repository state — updates instantly.
+    private var summary: PortfolioSummary {
+        apiSummary ?? SamplePortfolioData.summary(for: repository.propertyInputs)
+    }
+
+    private var properties: [PortfolioProperty] {
+        apiProperties ?? SamplePortfolioData.properties(
+            for: repository.propertyInputs,
+            newCount: repository.addedCount
+        )
+    }
 
     var body: some View {
         ScrollView {
@@ -21,18 +34,16 @@ struct PortfolioSummaryView: View {
                 // "YOUR PROPERTIES (N)" + "+ Add" row
                 propertiesSectionHeader
 
-                // Property cards or loading indicator
-                if isLoading {
-                    ProgressView()
-                        .tint(.brandPrimary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
-                } else {
-                    ForEach(properties) { property in
+                // Property cards
+                ForEach(Array(properties.enumerated()), id: \.element.id) { index, property in
+                    SwipeableCardView(
+                        onEdit: { onEditProperty(index) },
+                        onDelete: { propertyToDeleteIndex = index }
+                    ) {
                         PortfolioPropertyCardView(property: property, onClick: onPropertyTap)
-                            .padding(.horizontal, Spacing.xxxl)
-                            .padding(.bottom, Spacing.xxxl)
                     }
+                    .padding(.horizontal, Spacing.xxxl)
+                    .padding(.bottom, Spacing.xxxl)
                 }
 
                 // Sticky bottom CTA (inside scroll on summary screen — matches Android)
@@ -43,23 +54,37 @@ struct PortfolioSummaryView: View {
             }
         }
         .background(Color.surfaceWhite)
+        .alert("Delete Property", isPresented: Binding(
+            get: { propertyToDeleteIndex != nil },
+            set: { if !$0 { propertyToDeleteIndex = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { propertyToDeleteIndex = nil }
+            Button("Delete", role: .destructive) {
+                if let index = propertyToDeleteIndex {
+                    withAnimation { repository.removeProperty(at: index) }
+                    // Clear API cache so local computation picks up immediately
+                    apiSummary = nil
+                    apiProperties = nil
+                }
+                propertyToDeleteIndex = nil
+            }
+        } message: {
+            Text("Are you sure you want to remove this property from your portfolio?")
+        }
         .task(id: repository.propertyInputs.count) {
-            let inputs = repository.propertyInputs
-            // Show locally-computed data immediately
-            summary    = SamplePortfolioData.summary(for: inputs)
-            properties = SamplePortfolioData.properties(for: inputs)
-            isLoading = false
-            // Then try API as an optional upgrade
+            // Try API as an optional upgrade over local computation
             do {
-                let response = try await PortfolioApi.fetchSummary(inputs: inputs)
+                let response = try await PortfolioApi.fetchSummary(inputs: repository.propertyInputs)
                 if !Task.isCancelled {
-                    summary    = response.summary.toUiSummary()
-                    properties = response.properties.enumerated().map { i, p in
+                    apiSummary    = response.summary.toUiSummary()
+                    apiProperties = response.properties.enumerated().map { i, p in
                         p.toUiProperty(variant: .plain)
                     }
                 }
             } catch {
-                // Local data already shown above
+                // Clear API state so computed properties use local data
+                apiSummary = nil
+                apiProperties = nil
             }
         }
     }

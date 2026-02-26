@@ -9,20 +9,23 @@ struct REPortfolioApp: App {
     }
 }
 
-enum AppScreen {
+enum AppScreen: Equatable {
     case portfolio
     case propertyDetail
     case addProperty
+    case editProperty(index: Int)
 }
 
 struct RootNavigationView: View {
+    @StateObject private var repository = PropertyRepository.shared
     @State private var activeScreen: AppScreen = .portfolio
 
     var body: some View {
         ZStack {
             PortfolioSummaryView(
                 onPropertyTap: { activeScreen = .propertyDetail },
-                onAddClick: { activeScreen = .addProperty }
+                onAddClick: { activeScreen = .addProperty },
+                onEditProperty: { index in activeScreen = .editProperty(index: index) }
             )
 
             if activeScreen == .propertyDetail {
@@ -37,6 +40,18 @@ struct RootNavigationView: View {
                 AddPropertyScreen(
                     onComplete: { activeScreen = .portfolio },
                     onBack: { activeScreen = .portfolio }
+                )
+                .transition(.move(edge: .trailing))
+            }
+
+            if case .editProperty(let index) = activeScreen {
+                AddPropertyScreen(
+                    onComplete: { activeScreen = .portfolio },
+                    onBack: { activeScreen = .portfolio },
+                    editingIndex: index,
+                    initialFormState: repository.propertyInputs.indices.contains(index)
+                        ? repository.propertyInputs[index].toFormState()
+                        : nil
                 )
                 .transition(.move(edge: .trailing))
             }

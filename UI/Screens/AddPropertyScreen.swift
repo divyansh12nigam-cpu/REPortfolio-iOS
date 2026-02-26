@@ -5,11 +5,15 @@ private let totalSteps = 2
 struct AddPropertyScreen: View {
     let onComplete: () -> Void
     let onBack: () -> Void
+    var editingIndex: Int? = nil
+    var initialFormState: OnboardingFormState? = nil
 
     @StateObject private var repository = PropertyRepository.shared
     @State private var currentStep = 1
     @State private var formState = OnboardingFormState()
     @State private var showSuccess = false
+
+    private var isEditMode: Bool { editingIndex != nil }
 
     private func handleBack() {
         if currentStep > 1 {
@@ -30,8 +34,8 @@ struct AddPropertyScreen: View {
                             currentStep: currentStep,
                             totalSteps: totalSteps,
                             title: currentStep == 1
-                                ? "Basic details of your property"
-                                : "Your net-worth is almost ready!",
+                                ? (isEditMode ? "Edit property details" : "Basic details of your property")
+                                : (isEditMode ? "Update property info" : "Your net-worth is almost ready!"),
                             onBack: handleBack
                         )
 
@@ -47,15 +51,26 @@ struct AddPropertyScreen: View {
                 BottomCtaBar(
                     currentStep: currentStep,
                     formState: formState,
+                    isEditMode: isEditMode,
                     onContinue: { currentStep = 2 },
                     onAddProperty: {
                         let input = buildPropertyInput(formState)
-                        repository.addProperty(input)
-                        showSuccess = true
+                        if let index = editingIndex {
+                            repository.updateProperty(at: index, with: input)
+                            onComplete()
+                        } else {
+                            repository.addProperty(input)
+                            showSuccess = true
+                        }
                     }
                 )
             }
             .background(Color.surfaceWhite)
+            .onAppear {
+                if let initial = initialFormState {
+                    formState = initial
+                }
+            }
         }
     }
 }
@@ -65,6 +80,7 @@ struct AddPropertyScreen: View {
 private struct BottomCtaBar: View {
     let currentStep: Int
     let formState: OnboardingFormState
+    var isEditMode: Bool = false
     let onContinue: () -> Void
     let onAddProperty: () -> Void
 
@@ -79,7 +95,10 @@ private struct BottomCtaBar: View {
     }
 
     private var isEnabled: Bool { currentStep == 1 ? isStep1Valid : isStep2Valid }
-    private var buttonText: String { currentStep == 1 ? "Continue" : "Add Property" }
+    private var buttonText: String {
+        if currentStep == 1 { return "Continue" }
+        return isEditMode ? "Save Changes" : "Add Property"
+    }
 
     var body: some View {
         Button(action: currentStep == 1 ? onContinue : onAddProperty) {
@@ -226,7 +245,12 @@ private func buildPropertyInput(_ form: OnboardingFormState) -> PropertyInput {
         purchaseYear: Int(form.purchaseYear) ?? 2024,
         monthlyRent: form.usageType == .rentLease
             ? Int(form.monthlyRent.replacingOccurrences(of: ",", with: "")) ?? 0
-            : 0
+            : 0,
+        societyName: form.societyName,
+        floorPlan: form.floorPlan,
+        customName: form.customName,
+        purchaseMonth: form.purchaseMonth,
+        usageType: form.usageType
     )
 }
 

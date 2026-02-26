@@ -31,6 +31,7 @@ struct PortfolioProperty: Identifiable {
     let cardVariant: PropertyCardVariant
     let insightText: String
     let actionLabel: String
+    let isNew: Bool
 
     init(
         title: String,
@@ -40,7 +41,8 @@ struct PortfolioProperty: Identifiable {
         monthlyRental: String,
         cardVariant: PropertyCardVariant,
         insightText: String = "",
-        actionLabel: String = ""
+        actionLabel: String = "",
+        isNew: Bool = false
     ) {
         self.title = title
         self.status = status
@@ -50,18 +52,19 @@ struct PortfolioProperty: Identifiable {
         self.cardVariant = cardVariant
         self.insightText = insightText
         self.actionLabel = actionLabel
+        self.isNew = isNew
     }
 }
 
 // ─── Onboarding enums + form state ──────────────────────────────────────────
 
-enum PropertyUsageType: String, CaseIterable {
+enum PropertyUsageType: String, CaseIterable, Codable {
     case selfUse = "Self-use"
     case rentLease = "Rent/lease"
     case investment = "Investment"
 }
 
-enum FloorPlan: String, CaseIterable {
+enum FloorPlan: String, CaseIterable, Codable {
     case bhk2 = "2 BHK"
     case bhk3 = "3 BHK"
     case bhk4 = "4 BHK"
