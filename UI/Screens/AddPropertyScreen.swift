@@ -27,45 +27,49 @@ struct AddPropertyScreen: View {
         if showSuccess {
             SuccessView(formState: formState, onComplete: onComplete)
         } else {
-            VStack(spacing: 0) {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        StepProgressHeaderView(
-                            currentStep: currentStep,
-                            totalSteps: totalSteps,
-                            title: currentStep == 1
-                                ? (isEditMode ? "Edit property details" : "Basic details of your property")
-                                : (isEditMode ? "Update property info" : "Your net-worth is almost ready!"),
-                            onBack: handleBack
-                        )
+            ZStack(alignment: .top) {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            StepProgressHeaderView(
+                                currentStep: currentStep,
+                                totalSteps: totalSteps,
+                                title: currentStep == 1
+                                    ? (isEditMode ? "Edit property details" : "Basic details of your property")
+                                    : (isEditMode ? "Update property info" : "Your net-worth is almost ready!"),
+                                onBack: handleBack
+                            )
 
-                        if currentStep == 1 {
-                            AddPropertyStep1View(formState: $formState)
-                        } else {
-                            AddPropertyStep2View(formState: $formState)
+                            if currentStep == 1 {
+                                AddPropertyStep1View(formState: $formState)
+                            } else {
+                                AddPropertyStep2View(formState: $formState)
+                            }
                         }
                     }
+
+                    // Bottom CTA
+                    BottomCtaBar(
+                        currentStep: currentStep,
+                        formState: formState,
+                        isEditMode: isEditMode,
+                        onContinue: { currentStep = 2 },
+                        onAddProperty: {
+                            let input = buildPropertyInput(formState)
+                            if let index = editingIndex {
+                                repository.updateProperty(at: index, with: input)
+                                onComplete()
+                            } else {
+                                repository.addProperty(input)
+                                showSuccess = true
+                            }
+                        }
+                    )
                 }
+                .background(Color.surfaceWhite)
 
-                // Bottom CTA
-                BottomCtaBar(
-                    currentStep: currentStep,
-                    formState: formState,
-                    isEditMode: isEditMode,
-                    onContinue: { currentStep = 2 },
-                    onAddProperty: {
-                        let input = buildPropertyInput(formState)
-                        if let index = editingIndex {
-                            repository.updateProperty(at: index, with: input)
-                            onComplete()
-                        } else {
-                            repository.addProperty(input)
-                            showSuccess = true
-                        }
-                    }
-                )
+                StatusBarFadeOverlay()
             }
-            .background(Color.surfaceWhite)
             .onAppear {
                 if let initial = initialFormState {
                     formState = initial

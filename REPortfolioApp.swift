@@ -11,7 +11,7 @@ struct REPortfolioApp: App {
 
 enum AppScreen: Equatable {
     case portfolio
-    case propertyDetail
+    case propertyDetail(index: Int)
     case addProperty
     case editProperty(index: Int)
 }
@@ -23,16 +23,20 @@ struct RootNavigationView: View {
     var body: some View {
         ZStack {
             PortfolioSummaryView(
-                onPropertyTap: { activeScreen = .propertyDetail },
+                onPropertyTap: { index in activeScreen = .propertyDetail(index: index) },
                 onAddClick: { activeScreen = .addProperty },
                 onEditProperty: { index in activeScreen = .editProperty(index: index) }
             )
 
-            if activeScreen == .propertyDetail {
+            if case .propertyDetail(let index) = activeScreen {
                 PropertyDetailView(
                     onBack: { activeScreen = .portfolio },
-                    detail: SamplePortfolioData.propertyDetail
+                    detail: SamplePortfolioData.propertyDetail(
+                        for: repository.propertyInputs,
+                        at: index
+                    )
                 )
+                .swipeBack(onBack: { activeScreen = .portfolio })
                 .transition(.move(edge: .trailing))
             }
 
@@ -41,6 +45,7 @@ struct RootNavigationView: View {
                     onComplete: { activeScreen = .portfolio },
                     onBack: { activeScreen = .portfolio }
                 )
+                .swipeBack(onBack: { activeScreen = .portfolio })
                 .transition(.move(edge: .trailing))
             }
 
@@ -53,6 +58,7 @@ struct RootNavigationView: View {
                         ? repository.propertyInputs[index].toFormState()
                         : nil
                 )
+                .swipeBack(onBack: { activeScreen = .portfolio })
                 .transition(.move(edge: .trailing))
             }
         }

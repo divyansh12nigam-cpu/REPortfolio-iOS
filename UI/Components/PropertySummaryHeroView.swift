@@ -4,78 +4,113 @@ struct PropertySummaryHeroView: View {
     let detail: PropertyDetail
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.xl) {
-            // Property name + status + 3-dot menu
+        VStack(alignment: .leading, spacing: Spacing.xxl) {
+            // Property name + status tag + 3-dot menu
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
                     Text(detail.title)
-                        .font(Typography.titleSmall)
+                        .font(Typography.priceLabel)
+                        .tracking(-0.4)
                         .foregroundColor(.textPrimary)
                     Text(detail.location)
                         .font(Typography.bodySmall)
                         .foregroundColor(.textSecondary)
                 }
                 Spacer()
-                HStack(spacing: Spacing.s) {
-                    // Status pill
-                    Text("✓ \(detail.status)")
-                        .font(Typography.captionMed)
-                        .foregroundColor(.textPrimary)
-                        .padding(.horizontal, Spacing.xl)
-                        .padding(.vertical, Spacing.s)
-                        .background(Color.surfaceWhite.opacity(0.6))
-                        .clipShape(Capsule())
-                        .overlay(Capsule().stroke(Color.borderSubtle, lineWidth: 1))
+                HStack(spacing: Spacing.l) {
+                    // Status pill — checkmark + label
+                    HStack(spacing: Spacing.m) {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.textPrimary)
+                        Text(detail.status)
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textPrimary)
+                    }
+                    .padding(.horizontal, Spacing.l)
+                    .padding(.vertical, Spacing.s)
+                    .background(Color.surfaceLowContrast)
+                    .clipShape(Capsule())
 
+                    // 3-dot menu in white circle
                     Image(systemName: "ellipsis")
-                        .font(.system(size: 16))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.textPrimary)
+                        .frame(width: 28, height: 28)
+                        .background(Color.surfaceWhite)
+                        .clipShape(Circle())
+                }
+            }
+
+            // Estimated value section
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Estimated current value")
+                        .font(Typography.bodySmall)
+                        .foregroundColor(.textPrimary)
+                    Text(detail.estValueRange)
+                        .font(Typography.displaySmall)
+                        .tracking(-0.72)
                         .foregroundColor(.textPrimary)
                 }
-            }
 
-            // Estimated value
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                Text("Estimated current value")
-                    .font(Typography.bodySmallThin)
-                    .foregroundColor(.textSecondary)
-                Text(detail.estValueRange)
-                    .font(Typography.displaySmall)
-                    .tracking(-0.72)
-                    .foregroundColor(.textPrimary)
-            }
-
-            // "+ Add exact value" + info row
-            HStack(spacing: Spacing.l) {
-                Button(action: {}) {
-                    Text("+ Add exact value")
-                        .font(Typography.bodySmall)
+                // "+ Add exact value" + "Why add exact value?"
+                HStack(spacing: Spacing.l) {
+                    Button(action: {}) {
+                        HStack(spacing: Spacing.s) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 14, weight: .semibold))
+                            Text("Add exact value")
+                                .font(Typography.bodySmall)
+                        }
                         .foregroundColor(.brandPrimary)
-                }
-                HStack(spacing: Spacing.xs) {
-                    Text("Why add exact value?")
-                        .font(Typography.bodySmallThin)
-                        .foregroundColor(.textSecondary)
-                    Image(systemName: "info.circle")
-                        .font(.system(size: 12))
-                        .foregroundColor(.textSecondary)
+                    }
+
+                    HStack(spacing: Spacing.xs) {
+                        Text("Why add exact value?")
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textSecondary)
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 14))
+                            .foregroundColor(.textSecondary)
+                    }
                 }
             }
 
+            // Thin divider
             Divider().overlay(Color.borderSubtle)
 
-            // 4-column stats
-            HStack(alignment: .top) {
-                PropertyStatView(label: "Invested",     value: detail.invested)
+            // 4-column stats row
+            HStack(alignment: .center) {
+                PropertyStatView(label: "Invested", value: detail.invested)
                 Spacer()
-                PropertyStatView(label: "Est. Growth",  value: detail.estGrowth)
+                PropertyStatView(label: "Est. Growth", value: detail.estGrowth)
                 Spacer()
-                PropertyStatGreenView(label: "Est. %Growth", value: detail.estGrowthPercent)
+                // Growth % — ▲ value >
+                VStack(alignment: .leading, spacing: Spacing.m) {
+                    Text("Est. %Growth")
+                        .font(Typography.bodySmall)
+                        .foregroundColor(.textSecondary)
+                    HStack(spacing: 2) {
+                        Image(systemName: "arrowtriangle.up.fill")
+                            .font(.system(size: 8))
+                            .foregroundColor(.textPrimary)
+                        Text(detail.estGrowthPercent)
+                            .font(Typography.bodyLarge)
+                            .foregroundColor(.textPrimary)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.textPrimary)
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: false)
                 Spacer()
                 PropertyStatView(label: "Annual Rental", value: detail.annualRental)
             }
+            .padding(.horizontal, Spacing.xxxl)
         }
         .padding(.horizontal, Spacing.xxxl)
-        .padding(.vertical, Spacing.xxl)
+        .padding(.vertical, Spacing.xxxxl)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -90,25 +125,13 @@ private struct PropertyStatView: View {
     let label: String
     let value: String
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(label).font(Typography.bodySmallThin).foregroundColor(.textSecondary)
-            Text(value).font(Typography.bodyLarge).foregroundColor(.textPrimary)
-        }
-    }
-}
-
-private struct PropertyStatGreenView: View {
-    let label: String
-    let value: String
-    var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(label).font(Typography.bodySmallThin).foregroundColor(.textSecondary)
-            HStack(spacing: Spacing.xs) {
-                Image(systemName: "arrow.up")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.textGreen)
-                Text(value).font(Typography.bodyLarge).foregroundColor(.textGreen)
-            }
+        VStack(alignment: .leading, spacing: Spacing.m) {
+            Text(label)
+                .font(Typography.bodySmall)
+                .foregroundColor(.textSecondary)
+            Text(value)
+                .font(Typography.bodyLarge)
+                .foregroundColor(.textPrimary)
         }
     }
 }

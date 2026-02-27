@@ -6,43 +6,52 @@ struct PropertyDetailView: View {
     let detail: PropertyDetail
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Scrollable content
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    PortfolioPageHeaderView(
-                        title: detail.title,
-                        showRightButton: false,
-                        onBack: onBack
-                    )
+        ZStack(alignment: .top) {
+            VStack(spacing: 0) {
+                // Scrollable content
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        PortfolioPageHeaderView(
+                            title: detail.title,
+                            showRightButton: false,
+                            onBack: onBack
+                        )
 
-                    PropertySummaryHeroView(detail: detail)
+                        PropertySummaryHeroView(detail: detail)
 
-                    Spacer().frame(height: Spacing.widgetsM)
+                        Spacer().frame(height: Spacing.widgetsM)
 
-                    InvestmentComparisonCardView(detail: detail)
-                        .padding(.horizontal, Spacing.xxxl)
+                        InvestmentComparisonCardView(detail: detail)
+                            .padding(.horizontal, Spacing.xxxl)
 
-                    Spacer().frame(height: Spacing.widgetsM)
+                        Spacer().frame(height: Spacing.widgetsM)
 
-                    RentalDetailsCardView(detail: detail)
+                        RentalDetailsCardView(detail: detail)
 
-                    Spacer().frame(height: Spacing.widgetsM)
+                        Spacer().frame(height: Spacing.widgetsM)
 
-                    LocalDemandSectionView(detail: detail)
+                        LocalDemandSectionView(detail: detail)
 
-                    Spacer().frame(height: Spacing.widgetsM)
+                        Spacer().frame(height: Spacing.widgetsM)
 
-                    DisclaimerFooterView()
+                        // Simple text disclaimer (matches Figma)
+                        Text("*Disclaimer: Prices mentioned above are estimates based on properties posted on 99acres and do not suggest accurate value.")
+                            .font(Typography.bodySmallThin)
+                            .foregroundColor(.textSecondary)
+                            .padding(.horizontal, Spacing.xxxl)
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Spacer().frame(height: Spacing.widgetsM)
+                        Spacer().frame(height: Spacing.widgetsM)
+                    }
                 }
-            }
 
-            // Sticky bottom bar — outside ScrollView, always visible
-            PropertyDetailBottomBarView()
+                // Sticky bottom bar — outside ScrollView, always visible
+                PropertyDetailBottomBarView()
+            }
+            .background(Color.surfaceWhite)
+
+            StatusBarFadeOverlay()
         }
-        .background(Color.surfaceWhite)
     }
 }
 

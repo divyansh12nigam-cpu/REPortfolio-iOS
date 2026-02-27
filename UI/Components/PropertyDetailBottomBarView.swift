@@ -1,43 +1,44 @@
 import SwiftUI
 
 struct PropertyDetailBottomBarView: View {
-    var onSchedule: () -> Void = {}
-    var onCompare: () -> Void = {}
+    var onEditDetails: () -> Void = {}
+    var onPostForSale: () -> Void = {}
 
     var body: some View {
-        HStack(spacing: Spacing.xl) {
-            // "Compare" ghost button
-            Button(action: onCompare) {
-                Text("Compare")
-                    .font(Typography.bodyMedium)
-                    .foregroundColor(.brandPrimary)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 48)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Radius.element)
-                            .stroke(Color.brandPrimary, lineWidth: 1)
-                    )
+        HStack(spacing: Spacing.m) {
+            // "Edit Details" ghost button with pencil icon
+            Button(action: onEditDetails) {
+                HStack(spacing: Spacing.s) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 16, weight: .medium))
+                    Text("Edit Details")
+                        .font(Typography.bodyMedium)
+                }
+                .foregroundColor(.brandPrimary)
+                .frame(height: 44)
+                .padding(.horizontal, Spacing.xxxl)
+                .overlay(
+                    Capsule()
+                        .stroke(Color.borderSubtle, lineWidth: 1)
+                )
             }
 
-            // "Schedule Visit" filled button
-            Button(action: onSchedule) {
-                Text("Schedule Visit")
+            // "Post for Sell/Rent — Free" filled button
+            Button(action: onPostForSale) {
+                Text("Post for Sell/Rent — Free")
                     .font(Typography.bodyMedium)
-                    .foregroundColor(.surfaceWhite)
+                    .foregroundColor(.surfaceWhite.opacity(0.96))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 48)
+                    .frame(height: 44)
                     .background(Color.brandPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: Radius.element))
+                    .clipShape(Capsule())
             }
         }
         .padding(.horizontal, Spacing.xxxl)
-        .padding(.vertical, Spacing.xxl)
-        .background(Color.surfaceWhite)
-        .overlay(
-            Rectangle()
-                .frame(height: 0.5)
-                .foregroundColor(.borderSubtle)
-            , alignment: .top
+        .padding(.vertical, Spacing.xl)
+        .background(
+            Color.surfaceWhite
+                .shadow(color: .black.opacity(0.08), radius: 16, x: 0, y: -4)
         )
     }
 }

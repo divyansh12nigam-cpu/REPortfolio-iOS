@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PortfolioSummaryView: View {
-    var onPropertyTap: () -> Void = {}
+    var onPropertyTap: (Int) -> Void = { _ in }
     var onAddClick: () -> Void = {}
     var onEditProperty: (Int) -> Void = { _ in }
 
@@ -23,37 +23,41 @@ struct PortfolioSummaryView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                // Page header
-                PortfolioPageHeaderView()
+        ZStack(alignment: .top) {
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    // Page header
+                    PortfolioPageHeaderView()
 
-                // Hero section
-                PortfolioSummaryHeroView(summary: summary)
+                    // Hero section
+                    PortfolioSummaryHeroView(summary: summary)
 
-                // "YOUR PROPERTIES (N)" + "+ Add" row
-                propertiesSectionHeader
+                    // "YOUR PROPERTIES (N)" + "+ Add" row
+                    propertiesSectionHeader
 
-                // Property cards
-                ForEach(Array(properties.enumerated()), id: \.element.id) { index, property in
-                    SwipeableCardView(
-                        onEdit: { onEditProperty(index) },
-                        onDelete: { propertyToDeleteIndex = index }
-                    ) {
-                        PortfolioPropertyCardView(property: property, onClick: onPropertyTap)
+                    // Property cards
+                    ForEach(Array(properties.enumerated()), id: \.element.id) { index, property in
+                        SwipeableCardView(
+                            onEdit: { onEditProperty(index) },
+                            onDelete: { propertyToDeleteIndex = index }
+                        ) {
+                            PortfolioPropertyCardView(property: property, onClick: { onPropertyTap(index) })
+                        }
+                        .padding(.horizontal, Spacing.xxxl)
+                        .padding(.bottom, Spacing.xxxl)
                     }
-                    .padding(.horizontal, Spacing.xxxl)
-                    .padding(.bottom, Spacing.xxxl)
+
+                    // Sticky bottom CTA (inside scroll on summary screen — matches Android)
+                    StickyBottomButtonsView()
+
+                    // Disclaimer
+                    DisclaimerFooterView()
                 }
-
-                // Sticky bottom CTA (inside scroll on summary screen — matches Android)
-                StickyBottomButtonsView()
-
-                // Disclaimer
-                DisclaimerFooterView()
             }
+            .background(Color.surfaceWhite)
+
+            StatusBarFadeOverlay()
         }
-        .background(Color.surfaceWhite)
         .alert("Delete Property", isPresented: Binding(
             get: { propertyToDeleteIndex != nil },
             set: { if !$0 { propertyToDeleteIndex = nil } }

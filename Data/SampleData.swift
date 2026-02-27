@@ -138,11 +138,12 @@ enum SamplePortfolioData {
 
     static var summary: PortfolioSummary { summary(for: propertyInputs) }
 
-    // ─── Property detail (index 2 — Old Home in Vasundhra) ───────────────────
+    // ─── Property detail ───────────────────────────────────────────────────────
 
-    static var propertyDetail: PropertyDetail {
-        let vals = valuations
-        let v = vals[2]
+    static func propertyDetail(for inputs: [PropertyInput], at index: Int) -> PropertyDetail {
+        let vals = valuations(for: inputs)
+        guard vals.indices.contains(index) else { return propertyDetail }
+        let v = vals[index]
         let p = v.input
         let annualRent = Double(p.monthlyRent) * 12
         let rentalYield = v.fairValue > 0 ? (annualRent / v.fairValue) * 100 : 0.0
@@ -169,12 +170,21 @@ enum SamplePortfolioData {
             rentalYield: String(format: "%.1f%%", rentalYield),
             rentDueDay: "23 of every month",
             leaseRenewal: "23 Jan every year",
-            insightLoss: "You're losing approx. ₹7,000 monthly",
-            insightOpportunity: "Similar properties get up to ₹37,000 per month",
+            insightLoss: p.monthlyRent > 0
+                ? "You're losing approx. \(Formatters.formatRent(Double(p.monthlyRent) * 0.23)) monthly"
+                : "Property is not generating rental income",
+            insightOpportunity: p.monthlyRent > 0
+                ? "Similar properties get up to \(Formatters.formatRent(Double(p.monthlyRent) * 1.23)) per month"
+                : "List this property to start earning rental income",
             activeTenants: "212 active tenants",
             tenantGrowth: "4.2% increase this month/from last year",
             postedForRent: "112 posted for rent",
             postedGrowth: "1.2% increase this month/from last year"
         )
+    }
+
+    /// Preview fallback — uses seed data at index 2
+    static var propertyDetail: PropertyDetail {
+        propertyDetail(for: propertyInputs, at: 2)
     }
 }

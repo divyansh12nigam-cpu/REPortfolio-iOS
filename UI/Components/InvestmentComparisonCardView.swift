@@ -3,101 +3,138 @@ import SwiftUI
 struct InvestmentComparisonCardView: View {
     let detail: PropertyDetail
 
+    // Illustration assets — replace with bundled images before shipping (URLs expire in 7 days)
+    private let houseImg = "https://www.figma.com/api/mcp/asset/4a84a013-c012-45dd-82ac-e70c3be3621f"
+    private let goldImg  = "https://www.figma.com/api/mcp/asset/b228abc4-39d6-4288-96b1-81664d99c7fb"
+    private let niftyImg = "https://www.figma.com/api/mcp/asset/53286dc1-edbe-45b9-a216-cdef2cf688de"
+
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xl) {
-            // Card title (two-line with different styles)
-            VStack(alignment: .leading, spacing: Spacing.xs) {
+            // Card title (two-line, both semibold textPrimary)
+            VStack(alignment: .leading, spacing: 0) {
                 Text("If \(detail.comparisonInvested) was invested in \(detail.comparisonYear):")
-                    .font(Typography.bodySmallThin)
-                    .foregroundColor(.textSecondary)
+                    .font(Typography.bodySmall)
+                    .foregroundColor(.textPrimary)
                 Text("Property vs Gold vs Equity")
-                    .font(Typography.titleSmall)
+                    .font(Typography.bodyLarge)
                     .foregroundColor(.textPrimary)
             }
 
-            // Comparison columns container
-            HStack(spacing: Spacing.s) {
-                // Your Property — card (elevated, white bg)
-                VStack(spacing: Spacing.s) {
-                    BarChartView(heightFraction: 0.85, color: .brandPrimary)
-                    HStack(spacing: Spacing.xs) {
-                        Text("Your Property").font(Typography.bodySmallThin).foregroundColor(.textSecondary)
-                        Text("🎉").font(.system(size: 12))
+            // Warm beige container with 3 columns
+            HStack(alignment: .top, spacing: Spacing.s) {
+                // ── Your Property — white elevated card ──────────────
+                VStack(alignment: .leading, spacing: Spacing.xxl) {
+                    // Top group: illustration + label + divider
+                    VStack(alignment: .leading, spacing: Spacing.l) {
+                        ZStack(alignment: .topTrailing) {
+                            AsyncImage(url: URL(string: houseImg)) { image in
+                                image.resizable().aspectRatio(contentMode: .fit)
+                            } placeholder: {
+                                Color.clear
+                            }
+                            .frame(width: 65, height: 38)
+
+                            // 🎉 floating badge — anchored to image top-right
+                            Text("🎉")
+                                .font(Typography.bodyMedium)
+                                .frame(width: 30, height: 30)
+                                .background(Color.insightAccentBg)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.08), radius: 16, x: 0, y: 4)
+                                .offset(x: 20, y: -16)
+                        }
+
+                        Text("Your Property")
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textPrimary)
+
+                        Divider().overlay(Color.borderSubtle)
                     }
-                    Text(detail.propertyReturn)
-                        .font(Typography.priceLabel)
-                        .foregroundColor(.textPrimary)
-                    Text(detail.yearsLabel)
-                        .font(Typography.bodySmallThin)
-                        .foregroundColor(.textDisabled)
+
+                    // Bottom group: percentage + years
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(detail.propertyReturn)
+                            .font(Typography.priceLabel)
+                            .tracking(-0.4)
+                            .foregroundColor(.textPrimary)
+                        Text(detail.yearsLabel)
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textDisabled)
+                    }
                 }
                 .padding(.horizontal, Spacing.xl)
-                .padding(.vertical, Spacing.xl)
-                .frame(maxWidth: .infinity)
+                .padding(.vertical, Spacing.xxxl)
+                .frame(width: 135)
                 .background(Color.surfaceWhite)
                 .clipShape(RoundedRectangle(cornerRadius: Radius.element))
-                .shadow(color: .shadowNeutralLow, radius: Elevation.cardShadow, x: 0, y: 2)
+                .shadow(color: .shadowNeutralLow, radius: Elevation.cardShadow, x: 0, y: 1)
 
-                // Gold column
-                ComparisonColumnView(
-                    heightFraction: 0.55, barColor: Color(hex: "FFD700"),
-                    label: "Gold", returnPercent: detail.goldReturn, yearsLabel: detail.yearsLabel
-                )
-                .frame(maxWidth: .infinity)
+                // ── Gold — transparent on beige ─────────────────────
+                VStack(alignment: .leading, spacing: Spacing.xxl) {
+                    VStack(alignment: .leading, spacing: Spacing.l) {
+                        AsyncImage(url: URL(string: goldImg)) { image in
+                            image.resizable().aspectRatio(contentMode: .fit)
+                        } placeholder: {
+                            Color.clear
+                        }
+                        .frame(width: 65, height: 38)
 
-                // Nifty 50 column
-                ComparisonColumnView(
-                    heightFraction: 0.65, barColor: Color(hex: "4CAF50"),
-                    label: "Nifty 50", returnPercent: detail.niftyReturn, yearsLabel: detail.yearsLabel
-                )
-                .frame(maxWidth: .infinity)
+                        Text("Gold")
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textPrimary)
+
+                        Divider().overlay(Color.borderSubtle)
+                    }
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(detail.goldReturn)
+                            .font(Typography.priceLabel)
+                            .tracking(-0.4)
+                            .foregroundColor(.textPrimary)
+                        Text(detail.yearsLabel)
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textDisabled)
+                    }
+                }
+                .padding(.horizontal, Spacing.xl)
+                .padding(.vertical, Spacing.xxxl)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                // ── Nifty 50 — transparent on beige ─────────────────
+                VStack(alignment: .leading, spacing: Spacing.xxl) {
+                    VStack(alignment: .leading, spacing: Spacing.l) {
+                        AsyncImage(url: URL(string: niftyImg)) { image in
+                            image.resizable().aspectRatio(contentMode: .fit)
+                        } placeholder: {
+                            Color.clear
+                        }
+                        .frame(width: 53, height: 38)
+
+                        Text("Nifty 50")
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textPrimary)
+
+                        Divider().overlay(Color.borderSubtle)
+                    }
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(detail.niftyReturn)
+                            .font(Typography.priceLabel)
+                            .tracking(-0.4)
+                            .foregroundColor(.textPrimary)
+                        Text(detail.yearsLabel)
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textDisabled)
+                    }
+                }
+                .padding(.horizontal, Spacing.xl)
+                .padding(.vertical, Spacing.xxxl)
+                .frame(width: 95, alignment: .leading)
             }
             .padding(Spacing.s)
-            .background(Color.surfaceLowContrast)
+            .background(Color.surfaceAccentBase)
             .clipShape(RoundedRectangle(cornerRadius: Radius.card))
         }
-    }
-}
-
-private struct ComparisonColumnView: View {
-    let heightFraction: Double
-    let barColor: Color
-    let label: String
-    let returnPercent: String
-    let yearsLabel: String
-
-    var body: some View {
-        VStack(spacing: Spacing.s) {
-            BarChartView(heightFraction: heightFraction, color: barColor)
-            Text(label).font(Typography.bodySmallThin).foregroundColor(.textSecondary)
-            Text(returnPercent).font(Typography.priceLabel).foregroundColor(.textPrimary)
-            Text(yearsLabel).font(Typography.bodySmallThin).foregroundColor(.textDisabled)
-        }
-        .padding(.horizontal, Spacing.xl)
-        .padding(.vertical, Spacing.xl)
-    }
-}
-
-/// Simple bar chart placeholder (replaces expiring Figma asset URLs)
-private struct BarChartView: View {
-    let heightFraction: Double  // 0.0 – 1.0
-    let color: Color
-    private let maxHeight: CGFloat = 80
-
-    var body: some View {
-        VStack(alignment: .center) {
-            Spacer()
-            RoundedRectangle(cornerRadius: 4)
-                .fill(color.opacity(0.2))
-                .frame(width: 32, height: maxHeight * heightFraction)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(color)
-                        .frame(width: 32, height: maxHeight * heightFraction * 0.3)
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                )
-        }
-        .frame(width: 48, height: maxHeight)
     }
 }
 

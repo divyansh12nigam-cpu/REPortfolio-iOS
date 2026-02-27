@@ -1,0 +1,477 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* SwipeableCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2E1D0C9B8A7F6E5D4C3B2A1 /* SwipeableCardView.swift */; };
+		183D966FE3C53317DE1E20A0 /* PropertyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */; };
+		1B498C8356F9C6CE6165B282 /* AddPropertyStep2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E7E8E482E35D91EDAF108F /* AddPropertyStep2View.swift */; };
+		2F24C2669634B0E5FCDC1316 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE424C656C123DDAD8AF639 /* NetworkClient.swift */; };
+		321F3B179FB2E5FCB56E6A60 /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F43BAD809B4DD1D7540915 /* Formatters.swift */; };
+		34BA328A3A304618859AFD3E /* DisclaimerFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DC184ED7AC2302077C487E /* DisclaimerFooterView.swift */; };
+		35B1BEEE18EB97FCF985E5BE /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E899272FF3565F33FA8C8DA2 /* LocationData.swift */; };
+		3F1E7E8EB476CEFF2BCDD7DD /* PortfolioPageHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F39BD6C71F8AC57A439EBF /* PortfolioPageHeaderView.swift */; };
+		472E6EE38A336FBB87C0848D /* StickyBottomButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2812A6FFAD06A99E1D1AB091 /* StickyBottomButtonsView.swift */; };
+		4821C00C2BF6598CB27FB998 /* PortfolioSummaryHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE305BF4C558D676C1391A3 /* PortfolioSummaryHeroView.swift */; };
+		484A800092CBA9DD3DD84620 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35A1CC79014D070617BB651 /* Models.swift */; };
+		50D0CDE74E6EFC101036D178 /* StepProgressHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A304E339AF62D56B234E8F /* StepProgressHeaderView.swift */; };
+		5B24C0B87831EDED673CB223 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E930C63B931614A7B8C84A3F /* SampleData.swift */; };
+		A3B4C5D6E7F8091A2B3C4D5E /* StatusBarFadeOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E4C3B2A1F0E9D8C7B6A594 /* StatusBarFadeOverlay.swift */; };
+		B7C8D9E0F1A2B3C4D5E6F7A8 /* SwipeBackModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F7A8B9C0D1E2F3A4B5C6D7 /* SwipeBackModifier.swift */; };
+		602C5AA5C33A3CC65625D1E6 /* REPortfolioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315589ABEC99C29D1C6854F3 /* REPortfolioApp.swift */; };
+		7E4E73D2E9334497C356CD49 /* AutoSuggestTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1C77B80F5E6716C597CAD4 /* AutoSuggestTextFieldView.swift */; };
+		841788BA6A225C5957AB9254 /* LocalDemandSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDE0DF015506C587FC6830 /* LocalDemandSectionView.swift */; };
+		897DD301804CF7ED460EF2AE /* AddPropertyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A9940135A374AD78A6DFB42 /* AddPropertyScreen.swift */; };
+		8EF614BC7EA8B727A12724A5 /* PropertyPreviewCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D099757DA068BFDC08007C /* PropertyPreviewCardView.swift */; };
+		8F8371A73F1078459554A88E /* InvestmentComparisonCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFF345D22B917BA75BECEE0 /* InvestmentComparisonCardView.swift */; };
+		97565A3CE28AF70F93B2EE8B /* AddPropertyStep1View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491C2E965F6B8B57696FA742 /* AddPropertyStep1View.swift */; };
+		97988411B8087FA60AB4EB4A /* PropertyDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29423DC270ACF69FBFB1162 /* PropertyDetailView.swift */; };
+		987E7BEFEB339D3090B2BE94 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E59342973AC42085D95474 /* Colors.swift */; };
+		9BAA81C2E79A288FAF746922 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D8E7936B0FD339B986AB842 /* Tokens.swift */; };
+		AC98FC134989E6B10494E6F3 /* PropertySummaryHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E0901D3FAECB8F66C613A73 /* PropertySummaryHeroView.swift */; };
+		B3F02EF95F0C1CC52BC58C40 /* PropertyDetailBottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479252637DFA2B5B5C47949 /* PropertyDetailBottomBarView.swift */; };
+		B7355FB96DC941CE0425F870 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C9C241D014A3D03EF67DF15 /* Typography.swift */; };
+		C7695E283E567093789739D4 /* PortfolioApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6172DF5E8535BB97234FF5 /* PortfolioApi.swift */; };
+		C7818B528EF88A135DBA051A /* FormTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F40E0D9C91F87081776D809 /* FormTextFieldView.swift */; };
+		C98679A251FEE49C557D32B8 /* PortfolioSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F2C13EA9AAA9CD6D191A7E /* PortfolioSummaryView.swift */; };
+		C9C4211966752DA9CAE5EE69 /* RentalDetailsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2088287C23E1AD457B3EF7B7 /* RentalDetailsCardView.swift */; };
+		CBD673464BAAD7FB0285E65D /* ApiModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE996D08F12C853443C878C5 /* ApiModels.swift */; };
+		F6B836D02205FDEDE9BF8BF2 /* PortfolioPropertyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476951C95F0C74EED7215FB9 /* PortfolioPropertyCardView.swift */; };
+		F764583B7345FB00DEAA1E50 /* ChipSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A6838787355E32BE844A1 /* ChipSelectorView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		09D099757DA068BFDC08007C /* PropertyPreviewCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyPreviewCardView.swift; sourceTree = "<group>"; };
+		0D6172DF5E8535BB97234FF5 /* PortfolioApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioApi.swift; sourceTree = "<group>"; };
+		1C9C241D014A3D03EF67DF15 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		2088287C23E1AD457B3EF7B7 /* RentalDetailsCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RentalDetailsCardView.swift; sourceTree = "<group>"; };
+		2479252637DFA2B5B5C47949 /* PropertyDetailBottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyDetailBottomBarView.swift; sourceTree = "<group>"; };
+		2812A6FFAD06A99E1D1AB091 /* StickyBottomButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickyBottomButtonsView.swift; sourceTree = "<group>"; };
+		2D8E7936B0FD339B986AB842 /* Tokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tokens.swift; sourceTree = "<group>"; };
+		315589ABEC99C29D1C6854F3 /* REPortfolioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = REPortfolioApp.swift; sourceTree = "<group>"; };
+		39A304E339AF62D56B234E8F /* StepProgressHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepProgressHeaderView.swift; sourceTree = "<group>"; };
+		476951C95F0C74EED7215FB9 /* PortfolioPropertyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPropertyCardView.swift; sourceTree = "<group>"; };
+		491C2E965F6B8B57696FA742 /* AddPropertyStep1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPropertyStep1View.swift; sourceTree = "<group>"; };
+		49F2C13EA9AAA9CD6D191A7E /* PortfolioSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioSummaryView.swift; sourceTree = "<group>"; };
+		4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyRepository.swift; sourceTree = "<group>"; };
+		5F40E0D9C91F87081776D809 /* FormTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormTextFieldView.swift; sourceTree = "<group>"; };
+		65F39BD6C71F8AC57A439EBF /* PortfolioPageHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPageHeaderView.swift; sourceTree = "<group>"; };
+		6A9940135A374AD78A6DFB42 /* AddPropertyScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPropertyScreen.swift; sourceTree = "<group>"; };
+		77DC184ED7AC2302077C487E /* DisclaimerFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisclaimerFooterView.swift; sourceTree = "<group>"; };
+		7E0901D3FAECB8F66C613A73 /* PropertySummaryHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertySummaryHeroView.swift; sourceTree = "<group>"; };
+		8D1C77B80F5E6716C597CAD4 /* AutoSuggestTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSuggestTextFieldView.swift; sourceTree = "<group>"; };
+		998A6838787355E32BE844A1 /* ChipSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipSelectorView.swift; sourceTree = "<group>"; };
+		9DE424C656C123DDAD8AF639 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
+		B29423DC270ACF69FBFB1162 /* PropertyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyDetailView.swift; sourceTree = "<group>"; };
+		B6F43BAD809B4DD1D7540915 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		BF6DCCD59E669AB90575622D /* REPortfolio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = REPortfolio.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2BDE0DF015506C587FC6830 /* LocalDemandSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDemandSectionView.swift; sourceTree = "<group>"; };
+		C35A1CC79014D070617BB651 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		D7E7E8E482E35D91EDAF108F /* AddPropertyStep2View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPropertyStep2View.swift; sourceTree = "<group>"; };
+		DBFF345D22B917BA75BECEE0 /* InvestmentComparisonCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestmentComparisonCardView.swift; sourceTree = "<group>"; };
+		E899272FF3565F33FA8C8DA2 /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
+		E930C63B931614A7B8C84A3F /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		EE996D08F12C853443C878C5 /* ApiModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiModels.swift; sourceTree = "<group>"; };
+		F3E59342973AC42085D95474 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		FEE305BF4C558D676C1391A3 /* PortfolioSummaryHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioSummaryHeroView.swift; sourceTree = "<group>"; };
+		F2E1D0C9B8A7F6E5D4C3B2A1 /* SwipeableCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeableCardView.swift; sourceTree = "<group>"; };
+		D5E4C3B2A1F0E9D8C7B6A594 /* StatusBarFadeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarFadeOverlay.swift; sourceTree = "<group>"; };
+		E6F7A8B9C0D1E2F3A4B5C6D7 /* SwipeBackModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBackModifier.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		295A2054CFB4690516877E12 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				6A9940135A374AD78A6DFB42 /* AddPropertyScreen.swift */,
+				49F2C13EA9AAA9CD6D191A7E /* PortfolioSummaryView.swift */,
+				B29423DC270ACF69FBFB1162 /* PropertyDetailView.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		3213FB19F877E0E8DFDD8FB1 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				F3E59342973AC42085D95474 /* Colors.swift */,
+				2D8E7936B0FD339B986AB842 /* Tokens.swift */,
+				1C9C241D014A3D03EF67DF15 /* Typography.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		33F915403B2E69BEE6F8EBCE /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				E899272FF3565F33FA8C8DA2 /* LocationData.swift */,
+				C35A1CC79014D070617BB651 /* Models.swift */,
+				4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */,
+				E930C63B931614A7B8C84A3F /* SampleData.swift */,
+				9327B533D34642E3E6A0C15B /* Network */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		54608BE00FE15779D6DD04B4 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A157FC9BBA743747DDB84A74 /* Components */,
+				295A2054CFB4690516877E12 /* Screens */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		59A498D637C6D0F13CE519E7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BF6DCCD59E669AB90575622D /* REPortfolio.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		73C15CA417E7F9734236ACB5 = {
+			isa = PBXGroup;
+			children = (
+				315589ABEC99C29D1C6854F3 /* REPortfolioApp.swift */,
+				33F915403B2E69BEE6F8EBCE /* Data */,
+				3213FB19F877E0E8DFDD8FB1 /* DesignSystem */,
+				54608BE00FE15779D6DD04B4 /* UI */,
+				9EE6A80CA3469D8691D3AA89 /* Utils */,
+				59A498D637C6D0F13CE519E7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9327B533D34642E3E6A0C15B /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				EE996D08F12C853443C878C5 /* ApiModels.swift */,
+				9DE424C656C123DDAD8AF639 /* NetworkClient.swift */,
+				0D6172DF5E8535BB97234FF5 /* PortfolioApi.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		9EE6A80CA3469D8691D3AA89 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				B6F43BAD809B4DD1D7540915 /* Formatters.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		A157FC9BBA743747DDB84A74 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				491C2E965F6B8B57696FA742 /* AddPropertyStep1View.swift */,
+				D7E7E8E482E35D91EDAF108F /* AddPropertyStep2View.swift */,
+				8D1C77B80F5E6716C597CAD4 /* AutoSuggestTextFieldView.swift */,
+				998A6838787355E32BE844A1 /* ChipSelectorView.swift */,
+				77DC184ED7AC2302077C487E /* DisclaimerFooterView.swift */,
+				5F40E0D9C91F87081776D809 /* FormTextFieldView.swift */,
+				DBFF345D22B917BA75BECEE0 /* InvestmentComparisonCardView.swift */,
+				C2BDE0DF015506C587FC6830 /* LocalDemandSectionView.swift */,
+				65F39BD6C71F8AC57A439EBF /* PortfolioPageHeaderView.swift */,
+				476951C95F0C74EED7215FB9 /* PortfolioPropertyCardView.swift */,
+				FEE305BF4C558D676C1391A3 /* PortfolioSummaryHeroView.swift */,
+				2479252637DFA2B5B5C47949 /* PropertyDetailBottomBarView.swift */,
+				09D099757DA068BFDC08007C /* PropertyPreviewCardView.swift */,
+				7E0901D3FAECB8F66C613A73 /* PropertySummaryHeroView.swift */,
+				2088287C23E1AD457B3EF7B7 /* RentalDetailsCardView.swift */,
+				D5E4C3B2A1F0E9D8C7B6A594 /* StatusBarFadeOverlay.swift */,
+				39A304E339AF62D56B234E8F /* StepProgressHeaderView.swift */,
+				2812A6FFAD06A99E1D1AB091 /* StickyBottomButtonsView.swift */,
+				E6F7A8B9C0D1E2F3A4B5C6D7 /* SwipeBackModifier.swift */,
+				F2E1D0C9B8A7F6E5D4C3B2A1 /* SwipeableCardView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3AE8FF4CE2582F59AF4E6B5A /* REPortfolio-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F1F2955D0C312693456095B /* Build configuration list for PBXNativeTarget "REPortfolio-iOS" */;
+			buildPhases = (
+				37254F4B217A42EACE78992E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "REPortfolio-iOS";
+			packageProductDependencies = (
+			);
+			productName = "REPortfolio-iOS";
+			productReference = BF6DCCD59E669AB90575622D /* REPortfolio.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		780073A36FE82B2AAF84F039 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 076B76B7B9BFEE4DD3F57EE4 /* Build configuration list for PBXProject "REPortfolio-iOS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 73C15CA417E7F9734236ACB5;
+			minimizedProjectReferenceProxies = 1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3AE8FF4CE2582F59AF4E6B5A /* REPortfolio-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		37254F4B217A42EACE78992E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				897DD301804CF7ED460EF2AE /* AddPropertyScreen.swift in Sources */,
+				97565A3CE28AF70F93B2EE8B /* AddPropertyStep1View.swift in Sources */,
+				1B498C8356F9C6CE6165B282 /* AddPropertyStep2View.swift in Sources */,
+				CBD673464BAAD7FB0285E65D /* ApiModels.swift in Sources */,
+				7E4E73D2E9334497C356CD49 /* AutoSuggestTextFieldView.swift in Sources */,
+				F764583B7345FB00DEAA1E50 /* ChipSelectorView.swift in Sources */,
+				987E7BEFEB339D3090B2BE94 /* Colors.swift in Sources */,
+				34BA328A3A304618859AFD3E /* DisclaimerFooterView.swift in Sources */,
+				C7818B528EF88A135DBA051A /* FormTextFieldView.swift in Sources */,
+				321F3B179FB2E5FCB56E6A60 /* Formatters.swift in Sources */,
+				8F8371A73F1078459554A88E /* InvestmentComparisonCardView.swift in Sources */,
+				841788BA6A225C5957AB9254 /* LocalDemandSectionView.swift in Sources */,
+				35B1BEEE18EB97FCF985E5BE /* LocationData.swift in Sources */,
+				484A800092CBA9DD3DD84620 /* Models.swift in Sources */,
+				2F24C2669634B0E5FCDC1316 /* NetworkClient.swift in Sources */,
+				C7695E283E567093789739D4 /* PortfolioApi.swift in Sources */,
+				3F1E7E8EB476CEFF2BCDD7DD /* PortfolioPageHeaderView.swift in Sources */,
+				F6B836D02205FDEDE9BF8BF2 /* PortfolioPropertyCardView.swift in Sources */,
+				4821C00C2BF6598CB27FB998 /* PortfolioSummaryHeroView.swift in Sources */,
+				C98679A251FEE49C557D32B8 /* PortfolioSummaryView.swift in Sources */,
+				B3F02EF95F0C1CC52BC58C40 /* PropertyDetailBottomBarView.swift in Sources */,
+				97988411B8087FA60AB4EB4A /* PropertyDetailView.swift in Sources */,
+				8EF614BC7EA8B727A12724A5 /* PropertyPreviewCardView.swift in Sources */,
+				183D966FE3C53317DE1E20A0 /* PropertyRepository.swift in Sources */,
+				AC98FC134989E6B10494E6F3 /* PropertySummaryHeroView.swift in Sources */,
+				602C5AA5C33A3CC65625D1E6 /* REPortfolioApp.swift in Sources */,
+				C9C4211966752DA9CAE5EE69 /* RentalDetailsCardView.swift in Sources */,
+				5B24C0B87831EDED673CB223 /* SampleData.swift in Sources */,
+				A3B4C5D6E7F8091A2B3C4D5E /* StatusBarFadeOverlay.swift in Sources */,
+				B7C8D9E0F1A2B3C4D5E6F7A8 /* SwipeBackModifier.swift in Sources */,
+				50D0CDE74E6EFC101036D178 /* StepProgressHeaderView.swift in Sources */,
+				472E6EE38A336FBB87C0848D /* StickyBottomButtonsView.swift in Sources */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* SwipeableCardView.swift in Sources */,
+				9BAA81C2E79A288FAF746922 /* Tokens.swift in Sources */,
+				B7355FB96DC941CE0425F870 /* Typography.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0E28B78108E49B63CE9C355E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = UAQ4892BS9;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_NAME = REPortfolio;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2677319E7D65B855ABAD4D5F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.re.portfolio.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		8212808AB8951705A00AD071 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = UAQ4892BS9;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_NAME = REPortfolio;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DE2BB4101A53AB28BEA949F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.re.portfolio.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		076B76B7B9BFEE4DD3F57EE4 /* Build configuration list for PBXProject "REPortfolio-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2677319E7D65B855ABAD4D5F /* Debug */,
+				DE2BB4101A53AB28BEA949F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9F1F2955D0C312693456095B /* Build configuration list for PBXNativeTarget "REPortfolio-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0E28B78108E49B63CE9C355E /* Debug */,
+				8212808AB8951705A00AD071 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 780073A36FE82B2AAF84F039 /* Project object */;
+}
