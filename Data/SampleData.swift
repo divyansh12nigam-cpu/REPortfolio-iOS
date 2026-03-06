@@ -70,10 +70,33 @@ enum SamplePortfolioData {
         let growth: Double
     }
 
-    private static func valuations(for inputs: [PropertyInput]) -> [Valuation] {
+    /// Compute valuations for each property.
+    /// If a real 99acres-based valuation exists (from the valuation service), use it.
+    /// Otherwise, fall back to the hardcoded city base price per sqft.
+    private static func valuations(
+        for inputs: [PropertyInput],
+        realValuations: [String: CachedValuation]? = nil
+    ) -> [Valuation] {
         inputs.map { p in
+            // Use real 99acres valuation if available
+            if let real = realValuations?[p.projectName] {
+                return Valuation(
+                    input: p,
+                    fairValue: real.fairValue,
+                    lowValue: real.valueLow,
+                    highValue: real.valueHigh,
+                    growth: real.growth
+                )
+            }
+            // Fallback: hardcoded city base price
             let pricePerSqft = Double(cityBasePrice[p.city] ?? defaultBasePrice)
-            let fair  = pricePerSqft * Double(p.areaSqft)
+            let fair: Double
+            if p.areaSqft > 0 {
+                fair = pricePerSqft * Double(p.areaSqft)
+            } else {
+                // No area entered — use city base price × 1000 sqft as reasonable estimate
+                fair = pricePerSqft * 1000
+            }
             let low   = fair * 0.95
             let high  = fair * 1.05
             let growth = high - Double(p.purchasePrice)
@@ -85,8 +108,12 @@ enum SamplePortfolioData {
 
     // ─── Properties list ──────────────────────────────────────────────────────
 
-    static func properties(for inputs: [PropertyInput], newCount: Int = 0) -> [PortfolioProperty] {
-        valuations(for: inputs).enumerated().map { i, v in
+    static func properties(
+        for inputs: [PropertyInput],
+        newCount: Int = 0,
+        realValuations: [String: CachedValuation]? = nil
+    ) -> [PortfolioProperty] {
+        valuations(for: inputs, realValuations: realValuations).enumerated().map { i, v in
             let isNew = i < newCount
             let variant = isNew ? .plain : {
                 let seedIndex = i - newCount
@@ -120,8 +147,11 @@ enum SamplePortfolioData {
 
     // ─── Computed summary ─────────────────────────────────────────────────────
 
-    static func summary(for inputs: [PropertyInput]) -> PortfolioSummary {
-        let vals = valuations(for: inputs)
+    static func summary(
+        for inputs: [PropertyInput],
+        realValuations: [String: CachedValuation]? = nil
+    ) -> PortfolioSummary {
+        let vals = valuations(for: inputs, realValuations: realValuations)
         let totalInvested = Double(inputs.reduce(0) { $0 + $1.purchasePrice })
         let totalHighValue = vals.reduce(0.0) { $0 + Formatters.roundToDisplayPrecision($1.highValue) }
         let totalGrowth = totalHighValue - totalInvested
@@ -141,8 +171,12 @@ enum SamplePortfolioData {
 
     // ─── Property detail ───────────────────────────────────────────────────────
 
-    static func propertyDetail(for inputs: [PropertyInput], at index: Int) -> PropertyDetail {
-        let vals = valuations(for: inputs)
+    static func propertyDetail(
+        for inputs: [PropertyInput],
+        at index: Int,
+        realValuations: [String: CachedValuation]? = nil
+    ) -> PropertyDetail {
+        let vals = valuations(for: inputs, realValuations: realValuations)
         guard vals.indices.contains(index) else { return propertyDetail }
         let v = vals[index]
         let p = v.input

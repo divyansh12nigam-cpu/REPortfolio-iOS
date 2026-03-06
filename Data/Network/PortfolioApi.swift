@@ -31,3 +31,60 @@ enum PortfolioApi {
         return try NetworkClient.decoder.decode(PortfolioApiResponse.self, from: data)
     }
 }
+
+// ─── Valuation API (99acres valuation service on port 3001) ──────────────────
+
+enum ValuationApi {
+    // Use Mac's local IP — "localhost" only works in simulator, not on physical devices
+    private static let baseURL = URL(string: "http://10.112.4.43:3001")!
+
+    /// Dedicated session with longer timeout — scraping multiple properties can take 60-90s.
+    private static let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 120
+        config.timeoutIntervalForResource = 180
+        return URLSession(configuration: config)
+    }()
+
+    /// POST /valuate-batch
+    static func fetchBatchValuation(
+        inputs: [PropertyInput]
+    ) async throws -> ValuationBatchResponse {
+        let url = baseURL.appendingPathComponent("valuate-batch")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 120
+
+        let body = ValuationBatchRequest(
+            properties: inputs.map { p in
+                ValuationInputDTO(
+                    projectName: p.projectName,
+                    city: p.city,
+                    locality: p.locality,
+                    societyName: p.societyName,
+                    areaSqft: p.areaSqft,
+                    purchasePrice: p.purchasePrice,
+                    monthlyRent: p.monthlyRent,
+                    floorPlan: p.floorPlan?.rawValue
+                )
+            }
+        )
+        request.httpBody = try JSONEncoder().encode(body)
+
+        print("[ValuationApi] POST \(url.absoluteString) with \(inputs.count) properties")
+
+        let (data, response) = try await session.data(for: request)
+
+        if let httpResponse = response as? HTTPURLResponse {
+            print("[ValuationApi] Response status: \(httpResponse.statusCode), body size: \(data.count) bytes")
+        }
+
+        let decoded = try JSONDecoder().decode(ValuationBatchResponse.self, from: data)
+        print("[ValuationApi] Decoded \(decoded.valuations.count) valuations")
+        for v in decoded.valuations {
+            print("[ValuationApi]   \(v.projectName): ₹\(Int(v.fairValue)) (source: \(v.source))")
+        }
+        return decoded
+    }
+}

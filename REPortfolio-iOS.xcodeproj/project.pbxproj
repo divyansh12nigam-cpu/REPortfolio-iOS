@@ -43,6 +43,8 @@
 		CBD673464BAAD7FB0285E65D /* ApiModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE996D08F12C853443C878C5 /* ApiModels.swift */; };
 		F6B836D02205FDEDE9BF8BF2 /* PortfolioPropertyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476951C95F0C74EED7215FB9 /* PortfolioPropertyCardView.swift */; };
 		F764583B7345FB00DEAA1E50 /* ChipSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A6838787355E32BE844A1 /* ChipSelectorView.swift */; };
+		2A3B4C5D6E7F8A9B0C1D2E3F /* ValuationApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D5E6F7A8B9C0D1E2F /* ValuationApi.swift */; };
+		4A5B6C7D8E9F0A1B2C3D4E5F /* ValuationApiModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4B5C6D7E8F9A0B1C2D3E4F /* ValuationApiModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -83,6 +85,8 @@
 		F2E1D0C9B8A7F6E5D4C3B2A1 /* SwipeableCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeableCardView.swift; sourceTree = "<group>"; };
 		D5E4C3B2A1F0E9D8C7B6A594 /* StatusBarFadeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarFadeOverlay.swift; sourceTree = "<group>"; };
 		E6F7A8B9C0D1E2F3A4B5C6D7 /* SwipeBackModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBackModifier.swift; sourceTree = "<group>"; };
+		1A2B3C4D5E6F7A8B9C0D1E2F /* ValuationApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationApi.swift; sourceTree = "<group>"; };
+		3A4B5C6D7E8F9A0B1C2D3E4F /* ValuationApiModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationApiModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -153,6 +157,8 @@
 				EE996D08F12C853443C878C5 /* ApiModels.swift */,
 				9DE424C656C123DDAD8AF639 /* NetworkClient.swift */,
 				0D6172DF5E8535BB97234FF5 /* PortfolioApi.swift */,
+				1A2B3C4D5E6F7A8B9C0D1E2F /* ValuationApi.swift */,
+				3A4B5C6D7E8F9A0B1C2D3E4F /* ValuationApiModels.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -281,6 +287,8 @@
 				A1B2C3D4E5F6A7B8C9D0E1F2 /* SwipeableCardView.swift in Sources */,
 				9BAA81C2E79A288FAF746922 /* Tokens.swift in Sources */,
 				B7355FB96DC941CE0425F870 /* Typography.swift in Sources */,
+				2A3B4C5D6E7F8A9B0C1D2E3F /* ValuationApi.swift in Sources */,
+				4A5B6C7D8E9F0A1B2C3D4E5F /* ValuationApiModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,7 +364,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -437,7 +445,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;

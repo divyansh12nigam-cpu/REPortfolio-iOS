@@ -36,7 +36,8 @@ struct RootNavigationView: View {
                     onBack: { activeScreen = .portfolio },
                     detail: SamplePortfolioData.propertyDetail(
                         for: repository.propertyInputs,
-                        at: index
+                        at: index,
+                        realValuations: repository.valuations.isEmpty ? nil : repository.valuations
                     )
                 )
                 .swipeBack(onBack: { activeScreen = .portfolio })

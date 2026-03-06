@@ -14,15 +14,26 @@ struct PortfolioSummaryView: View {
     @State private var apiProperties: [PortfolioProperty]? = nil
     @State private var propertyToDeleteIndex: Int? = nil
 
+    /// Real 99acres valuations from the valuation service (cached in repository).
+    /// Nil when no cached valuations exist — falls back to hardcoded city prices.
+    private var realValuations: [String: CachedValuation]? {
+        repository.valuations.isEmpty ? nil : repository.valuations
+    }
+
     /// Always derived from the latest repository state — updates instantly.
+    /// Uses real 99acres valuations when available, hardcoded city prices as fallback.
     private var summary: PortfolioSummary {
-        apiSummary ?? SamplePortfolioData.summary(for: repository.propertyInputs)
+        apiSummary ?? SamplePortfolioData.summary(
+            for: repository.propertyInputs,
+            realValuations: realValuations
+        )
     }
 
     private var properties: [PortfolioProperty] {
         apiProperties ?? SamplePortfolioData.properties(
             for: repository.propertyInputs,
-            newCount: repository.addedCount
+            newCount: repository.addedCount,
+            realValuations: realValuations
         )
     }
 
@@ -41,10 +52,7 @@ struct PortfolioSummaryView: View {
 
                     // Property cards
                     ForEach(Array(properties.enumerated()), id: \.element.id) { index, property in
-                        let stripSpacing: CGFloat = property.cardVariant == .addPurchasePrice
-                            ? -Spacing.l : -Spacing.xxl
-
-                        VStack(spacing: property.cardVariant == .plain ? 0 : stripSpacing) {
+                        VStack(spacing: property.cardVariant == .plain ? 0 : -Spacing.xxl) {
                             SwipeableCardView(
                                 onEdit: { onEditProperty(index) },
                                 onDelete: { propertyToDeleteIndex = index }
@@ -120,6 +128,11 @@ struct PortfolioSummaryView: View {
                 apiSummary = nil
                 apiProperties = nil
             }
+        }
+        .task(id: "valuation-\(repository.propertyInputs.count)") {
+            // Always refresh on launch — service caches internally, so this is cheap for repeat calls
+            print("[ValuationRefresh] Triggering refresh for \(repository.propertyInputs.count) properties")
+            await repository.refreshValuations()
         }
     }
 

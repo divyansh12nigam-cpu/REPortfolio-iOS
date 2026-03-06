@@ -89,6 +89,69 @@ struct OnboardingFormState {
     var customName: String = ""
 }
 
+// ─── Cached Valuation (from 99acres valuation service) ───────────────────────
+
+struct CachedValuation: Codable {
+    let valueLow: Double
+    let valueHigh: Double
+    let fairValue: Double
+    let pricePerSqft: Double
+    let growth: Double
+    let growthPercent: Double
+    let source: String
+    let confidence: String
+    let comparableCount: Int
+    let fetchedAt: Date
+}
+
+// ─── Valuation API DTOs ──────────────────────────────────────────────────────
+
+struct ValuationBatchRequest: Encodable {
+    let properties: [ValuationInputDTO]
+}
+
+struct ValuationInputDTO: Encodable {
+    let projectName: String
+    let city: String
+    let locality: String
+    let societyName: String
+    let areaSqft: Int
+    let purchasePrice: Int64
+    let monthlyRent: Int
+    let floorPlan: String?
+}
+
+struct ValuationBatchResponse: Decodable {
+    let valuations: [ApiValuation]
+    let summary: ApiValuationSummary
+}
+
+struct ApiValuation: Decodable {
+    let projectName: String
+    let valueLow: Double
+    let valueHigh: Double
+    let fairValue: Double
+    let pricePerSqft: Double
+    let growth: Double
+    let growthPercent: Double
+    let monthlyRent: Double
+    let annualRent: Double
+    let status: String
+    let source: String
+    let searchTier: String
+    let confidence: String
+    let comparableCount: Int
+    let cachedAt: String
+}
+
+struct ApiValuationSummary: Decodable {
+    let totalInvested: Double
+    let totalCurrentValue: Double
+    let totalGrowth: Double
+    let growthPercent: Double
+    let totalAnnualRental: Double
+}
+
 // ─── Property Detail ──────────────────────────────────────────────────────────
 
 struct PropertyDetail {
