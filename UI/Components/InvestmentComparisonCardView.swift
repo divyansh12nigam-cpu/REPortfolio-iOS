@@ -3,138 +3,117 @@ import SwiftUI
 struct InvestmentComparisonCardView: View {
     let detail: PropertyDetail
 
-    // Illustration assets — replace with bundled images before shipping (URLs expire in 7 days)
-    private let houseImg = "https://www.figma.com/api/mcp/asset/4a84a013-c012-45dd-82ac-e70c3be3621f"
-    private let goldImg  = "https://www.figma.com/api/mcp/asset/b228abc4-39d6-4288-96b1-81664d99c7fb"
-    private let niftyImg = "https://www.figma.com/api/mcp/asset/53286dc1-edbe-45b9-a216-cdef2cf688de"
+    // Icon colors — rgb values from Figma
+    private let indigoBg  = Color(red: 0.388, green: 0.400, blue: 0.945)
+    private let amberBg   = Color(red: 0.918, green: 0.702, blue: 0.031)
+    private let emeraldBg = Color(red: 0.063, green: 0.725, blue: 0.506)
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xl) {
-            // Card title (two-line, both semibold textPrimary)
-            VStack(alignment: .leading, spacing: 0) {
-                Text("If \(detail.comparisonInvested) was invested in \(detail.comparisonYear):")
-                    .font(Typography.bodySmall)
+            // Header
+            VStack(alignment: .leading, spacing: Spacing.s) {
+                Text("Investment Comparison")
+                    .font(Typography.bodyMedium)
                     .foregroundColor(.textPrimary)
-                Text("Property vs Gold vs Equity")
-                    .font(Typography.bodyLarge)
-                    .foregroundColor(.textPrimary)
+                Text("If \(detail.comparisonInvested) was invested in \(detail.comparisonYear)")
+                    .font(Typography.bodySmallThin)
+                    .foregroundColor(.black.opacity(0.5))
             }
 
-            // Warm beige container with 3 columns
-            HStack(alignment: .top, spacing: Spacing.s) {
-                // ── Your Property — white elevated card ──────────────
-                VStack(alignment: .leading, spacing: Spacing.xxl) {
-                    // Top group: illustration + label + divider
-                    VStack(alignment: .leading, spacing: Spacing.l) {
-                        ZStack(alignment: .topTrailing) {
-                            AsyncImage(url: URL(string: houseImg)) { image in
-                                image.resizable().aspectRatio(contentMode: .fit)
-                            } placeholder: {
-                                Color.clear
-                            }
-                            .frame(width: 65, height: 38)
-
-                            // 🎉 floating badge — anchored to image top-right
-                            Text("🎉")
-                                .font(Typography.bodyMedium)
-                                .frame(width: 30, height: 30)
-                                .background(Color.insightAccentBg)
-                                .clipShape(Circle())
-                                .shadow(color: .black.opacity(0.08), radius: 16, x: 0, y: 4)
-                                .offset(x: 20, y: -16)
-                        }
-
-                        Text("Your Property")
-                            .font(Typography.bodySmall)
-                            .foregroundColor(.textPrimary)
-
-                        Divider().overlay(Color.borderSubtle)
-                    }
-
-                    // Bottom group: percentage + years
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(detail.propertyReturn)
-                            .font(Typography.priceLabel)
-                            .tracking(-0.4)
-                            .foregroundColor(.textPrimary)
-                        Text(detail.yearsLabel)
-                            .font(Typography.bodySmall)
-                            .foregroundColor(.textDisabled)
-                    }
-                }
-                .padding(.horizontal, Spacing.xl)
-                .padding(.vertical, Spacing.xxxl)
-                .frame(width: 135)
-                .background(Color.surfaceWhite)
-                .clipShape(RoundedRectangle(cornerRadius: Radius.element))
-                .shadow(color: .shadowNeutralLow, radius: Elevation.cardShadow, x: 0, y: 1)
-
-                // ── Gold — transparent on beige ─────────────────────
-                VStack(alignment: .leading, spacing: Spacing.xxl) {
-                    VStack(alignment: .leading, spacing: Spacing.l) {
-                        AsyncImage(url: URL(string: goldImg)) { image in
-                            image.resizable().aspectRatio(contentMode: .fit)
-                        } placeholder: {
-                            Color.clear
-                        }
-                        .frame(width: 65, height: 38)
-
-                        Text("Gold")
-                            .font(Typography.bodySmall)
-                            .foregroundColor(.textPrimary)
-
-                        Divider().overlay(Color.borderSubtle)
-                    }
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(detail.goldReturn)
-                            .font(Typography.priceLabel)
-                            .tracking(-0.4)
-                            .foregroundColor(.textPrimary)
-                        Text(detail.yearsLabel)
-                            .font(Typography.bodySmall)
-                            .foregroundColor(.textDisabled)
-                    }
-                }
-                .padding(.horizontal, Spacing.xl)
-                .padding(.vertical, Spacing.xxxl)
+            // Beige card — three equal-width columns
+            HStack(alignment: .top, spacing: 0) {
+                comparisonColumn(
+                    icon: "house.fill",
+                    iconBg: indigoBg.opacity(0.1),
+                    iconTint: indigoBg,
+                    label: "Your Property",
+                    crown: true,
+                    value: detail.propertyReturn,
+                    winner: true
+                )
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                // ── Nifty 50 — transparent on beige ─────────────────
-                VStack(alignment: .leading, spacing: Spacing.xxl) {
-                    VStack(alignment: .leading, spacing: Spacing.l) {
-                        AsyncImage(url: URL(string: niftyImg)) { image in
-                            image.resizable().aspectRatio(contentMode: .fit)
-                        } placeholder: {
-                            Color.clear
-                        }
-                        .frame(width: 53, height: 38)
+                comparisonColumn(
+                    icon: "indianrupeesign.circle.fill",
+                    iconBg: amberBg.opacity(0.1),
+                    iconTint: amberBg,
+                    label: "Gold",
+                    crown: false,
+                    value: detail.goldReturn,
+                    winner: false
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Text("Nifty 50")
-                            .font(Typography.bodySmall)
-                            .foregroundColor(.textPrimary)
-
-                        Divider().overlay(Color.borderSubtle)
-                    }
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(detail.niftyReturn)
-                            .font(Typography.priceLabel)
-                            .tracking(-0.4)
-                            .foregroundColor(.textPrimary)
-                        Text(detail.yearsLabel)
-                            .font(Typography.bodySmall)
-                            .foregroundColor(.textDisabled)
-                    }
-                }
-                .padding(.horizontal, Spacing.xl)
-                .padding(.vertical, Spacing.xxxl)
-                .frame(width: 95, alignment: .leading)
+                comparisonColumn(
+                    icon: "chart.line.uptrend.xyaxis",
+                    iconBg: emeraldBg.opacity(0.1),
+                    iconTint: emeraldBg,
+                    label: "Nifty 50",
+                    crown: false,
+                    value: detail.niftyReturn,
+                    winner: false
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(Spacing.s)
+            .padding(.horizontal, Spacing.s)
+            .padding(.vertical, Spacing.l)
             .background(Color.surfaceAccentBase)
-            .clipShape(RoundedRectangle(cornerRadius: Radius.card))
+            .clipShape(RoundedRectangle(cornerRadius: Radius.element))
         }
+    }
+
+    @ViewBuilder
+    private func comparisonColumn(
+        icon: String,
+        iconBg: Color,
+        iconTint: Color,
+        label: String,
+        crown: Bool,
+        value: String,
+        winner: Bool
+    ) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.xxl) {
+            // Icon — 32×32 rounded-8
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(iconBg)
+                    .frame(width: 32, height: 32)
+                Image(systemName: icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 18, height: 18)
+                    .foregroundColor(iconTint)
+            }
+
+            // Label + divider
+            VStack(alignment: .leading, spacing: Spacing.m) {
+                HStack(spacing: Spacing.s) {
+                    if crown {
+                        Image(systemName: "crown.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 12, height: 12)
+                    }
+                    Text(label)
+                        .font(Typography.bodySmall)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                }
+                .foregroundColor(.textPrimary)
+                .opacity(0.93)
+
+                Divider().overlay(Color.borderSubtle)
+            }
+
+            // Return %
+            Text(value)
+                .font(winner ? Typography.priceLabel : .system(size: 20, weight: .regular))
+                .tracking(-0.4)
+                .lineLimit(1)
+                .foregroundColor(winner ? .textPrimary : .textSecondary)
+        }
+        .padding(.horizontal, Spacing.l)
+        .padding(.vertical, Spacing.l)
     }
 }
 

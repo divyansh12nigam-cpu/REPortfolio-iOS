@@ -10,10 +10,7 @@ struct PortfolioPropertyCardView: View {
     var onAddPurchasePriceTap: (() -> Void)? = nil
 
     var body: some View {
-        let stripSpacing: CGFloat = property.cardVariant == .addPurchasePrice
-            ? -Spacing.l : -Spacing.xxl
-
-        VStack(spacing: property.cardVariant == .plain ? 0 : stripSpacing) {
+        VStack(spacing: property.cardVariant == .plain ? 0 : -Spacing.xxl) {
             PropertyCardBodyView(property: property, onClick: onClick)
                 .zIndex(2)
             PropertyCardStripView(
@@ -121,6 +118,9 @@ struct PropertyCardStripView: View {
     var onPostNowTap: (() -> Void)? = nil
     var onAddPurchasePriceTap: (() -> Void)? = nil
 
+    // Shared purple shadow color for sparkle icon
+    private static let sparkleShadow = Color(hex: "6A51EC").opacity(0.3)
+
     var body: some View {
         switch property.cardVariant {
         case .plain:
@@ -134,67 +134,75 @@ struct PropertyCardStripView: View {
         }
     }
 
-    // Purple gradient strip
+    // Shared sparkle icon with purple drop shadow
+    private var sparkleIcon: some View {
+        Image(systemName: "sparkles")
+            .font(.system(size: 14))
+            .foregroundColor(.insightSparkle)
+            .shadow(color: Self.sparkleShadow, radius: 4, x: 0, y: 4)
+    }
+
+    // Shared purple gradient background + rounded bottom corners
+    private var insightGradientBackground: some View {
+        LinearGradient(
+            colors: [.insightBaseUltralight, .insightBaseLight],
+            startPoint: .leading, endPoint: .trailing
+        )
+    }
+
+    private var bottomRoundedShape: UnevenRoundedRectangle {
+        UnevenRoundedRectangle(
+            bottomLeadingRadius: Radius.element,
+            bottomTrailingRadius: Radius.element
+        )
+    }
+
+    // ── Insight strip: sparkle + text + chevron right ──
     private var insightStrip: some View {
         Button(action: { onInsightTap?() }) {
             HStack {
                 HStack(spacing: Spacing.m) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 18))
-                        .foregroundColor(.insightSparkle)
+                    sparkleIcon
                     Text(property.insightText)
                         .font(Typography.bodySmallThin)
                         .foregroundColor(.textPrimary)
                 }
                 Spacer()
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 16))
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.textSecondary)
             }
             .padding(.horizontal, Spacing.xxl)
             .padding(.top, Spacing.widgetsXs)
             .padding(.bottom, Spacing.xl)
             .frame(maxWidth: .infinity)
-            .background(
-                LinearGradient(
-                    colors: [.surfaceWhite, .purpleLight],
-                    startPoint: .top, endPoint: .bottom
-                )
-            )
-            .clipShape(
-                UnevenRoundedRectangle(
-                    bottomLeadingRadius: Radius.element,
-                    bottomTrailingRadius: Radius.element
-                )
-            )
+            .background(insightGradientBackground)
+            .clipShape(bottomRoundedShape)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
 
-    // Blue strip with "Post now" pill
+    // ── Insight action strip: sparkle + text + "Post property" pill ──
     private var insightActionStrip: some View {
         HStack(spacing: Spacing.xl) {
+            sparkleIcon
+
             Text(property.insightText)
                 .font(Typography.bodySmallThin)
                 .foregroundColor(.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Button(action: { onPostNowTap?() }) {
-                HStack(spacing: Spacing.s) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.textPrimary)
-                    Text("Post now")
-                        .font(Typography.bodySmall)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.textPrimary)
-                }
-                .padding(.horizontal, Spacing.xl)
-                .frame(height: Spacing.widgetsXs)
-                .background(Color.surfaceWhite)
-                .clipShape(Capsule())
-                .contentShape(Capsule())
+                Text("Post property")
+                    .font(Typography.bodyMedium)
+                    .foregroundColor(.textPrimary)
+                    .padding(.horizontal, Spacing.xxl)
+                    .frame(height: Spacing.widgetsM)
+                    .background(Color.surfaceWhite)
+                    .clipShape(Capsule())
+                    .shadow(color: .shadowNeutralLow, radius: Elevation.cardShadow, x: 0, y: 1)
+                    .contentShape(Capsule())
             }
             .buttonStyle(.plain)
         }
@@ -202,53 +210,43 @@ struct PropertyCardStripView: View {
         .padding(.top, Spacing.widgetsXs)
         .padding(.bottom, Spacing.xl)
         .frame(maxWidth: .infinity)
-        .background(Color.insightAccentBg)
-        .clipShape(
-            UnevenRoundedRectangle(
-                bottomLeadingRadius: Radius.element,
-                bottomTrailingRadius: Radius.element
-            )
-        )
+        .background(insightGradientBackground)
+        .clipShape(bottomRoundedShape)
     }
 
-    // Gray strip with purple border
+    // ── Add purchase price strip: sparkle + text column + circle plus button ──
     private var addPurchasePriceStrip: some View {
-        Button(action: { onAddPurchasePriceTap?() }) {
-            HStack(alignment: .top, spacing: Spacing.l) {
-                Image(systemName: "plus.circle")
+        HStack(spacing: Spacing.xl) {
+            sparkleIcon
+
+            VStack(alignment: .leading, spacing: 0) {
+                (Text("Add Purchase Price")
+                    .fontWeight(.bold)
+                + Text(" to view how your property has performed")
+                )
+                .font(Typography.bodySmallThin)
+                .foregroundColor(.textPrimary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button(action: { onAddPurchasePriceTap?() }) {
+                Image(systemName: "plus")
                     .font(.system(size: 20))
                     .foregroundColor(.textPrimary)
-                VStack(alignment: .leading, spacing: Spacing.xs) {
-                    Text("Add Purchase Price")
-                        .font(Typography.bodySmall)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.textPrimary)
-                    Text("to view how your money performed over the years")
-                        .font(Typography.bodySmallThin)
-                        .foregroundColor(.textSecondary)
-                }
+                    .frame(width: Spacing.widgetsM, height: Spacing.widgetsM)
+                    .background(Color.surfaceWhite)
+                    .clipShape(Circle())
+                    .shadow(color: .shadowNeutralLow, radius: Elevation.cardShadow, x: 0, y: 1)
+                    .contentShape(Circle())
             }
-            .padding(.horizontal, Spacing.xxxl)
-            .padding(.top, Spacing.xxxl)
-            .padding(.bottom, Spacing.xl)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.surfaceLowContrast)
-            .clipShape(
-                UnevenRoundedRectangle(
-                    bottomLeadingRadius: Radius.element,
-                    bottomTrailingRadius: Radius.element
-                )
-            )
-            .overlay(
-                UnevenRoundedRectangle(
-                    bottomLeadingRadius: Radius.element,
-                    bottomTrailingRadius: Radius.element
-                )
-                .stroke(Color.purpleLight, lineWidth: 1)
-            )
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, Spacing.xxl)
+        .padding(.top, Spacing.widgetsXs)
+        .padding(.bottom, Spacing.xl)
+        .frame(maxWidth: .infinity)
+        .background(insightGradientBackground)
+        .clipShape(bottomRoundedShape)
     }
 }
 
