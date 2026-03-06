@@ -12,6 +12,7 @@
 		1B498C8356F9C6CE6165B282 /* AddPropertyStep2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E7E8E482E35D91EDAF108F /* AddPropertyStep2View.swift */; };
 		2F24C2669634B0E5FCDC1316 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE424C656C123DDAD8AF639 /* NetworkClient.swift */; };
 		321F3B179FB2E5FCB56E6A60 /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F43BAD809B4DD1D7540915 /* Formatters.swift */; };
+		AA1B2C3D4E5F6A7B8C9D0E1F /* UrlBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB2C3D4E5F6A7B8C9D0E1F2A /* UrlBuilder.swift */; };
 		34BA328A3A304618859AFD3E /* DisclaimerFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DC184ED7AC2302077C487E /* DisclaimerFooterView.swift */; };
 		35B1BEEE18EB97FCF985E5BE /* LocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E899272FF3565F33FA8C8DA2 /* LocationData.swift */; };
 		3F1E7E8EB476CEFF2BCDD7DD /* PortfolioPageHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F39BD6C71F8AC57A439EBF /* PortfolioPageHeaderView.swift */; };
@@ -68,6 +69,7 @@
 		9DE424C656C123DDAD8AF639 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		B29423DC270ACF69FBFB1162 /* PropertyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyDetailView.swift; sourceTree = "<group>"; };
 		B6F43BAD809B4DD1D7540915 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		BB2C3D4E5F6A7B8C9D0E1F2A /* UrlBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlBuilder.swift; sourceTree = "<group>"; };
 		BF6DCCD59E669AB90575622D /* REPortfolio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = REPortfolio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2BDE0DF015506C587FC6830 /* LocalDemandSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDemandSectionView.swift; sourceTree = "<group>"; };
 		C35A1CC79014D070617BB651 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				B6F43BAD809B4DD1D7540915 /* Formatters.swift */,
+				BB2C3D4E5F6A7B8C9D0E1F2A /* UrlBuilder.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 				34BA328A3A304618859AFD3E /* DisclaimerFooterView.swift in Sources */,
 				C7818B528EF88A135DBA051A /* FormTextFieldView.swift in Sources */,
 				321F3B179FB2E5FCB56E6A60 /* Formatters.swift in Sources */,
+				AA1B2C3D4E5F6A7B8C9D0E1F /* UrlBuilder.swift in Sources */,
 				8F8371A73F1078459554A88E /* InvestmentComparisonCardView.swift in Sources */,
 				841788BA6A225C5957AB9254 /* LocalDemandSectionView.swift in Sources */,
 				35B1BEEE18EB97FCF985E5BE /* LocationData.swift in Sources */,

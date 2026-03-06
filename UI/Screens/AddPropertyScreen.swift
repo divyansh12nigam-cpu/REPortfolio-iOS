@@ -7,11 +7,14 @@ struct AddPropertyScreen: View {
     let onBack: () -> Void
     var editingIndex: Int? = nil
     var initialFormState: OnboardingFormState? = nil
+    /// When `true`, the screen opens directly on Step 2 with the purchase price field focused.
+    var startAtPurchasePrice: Bool = false
 
     @StateObject private var repository = PropertyRepository.shared
     @State private var currentStep = 1
     @State private var formState = OnboardingFormState()
     @State private var showSuccess = false
+    @State private var shouldFocusPurchasePrice = false
 
     private var isEditMode: Bool { editingIndex != nil }
 
@@ -43,7 +46,10 @@ struct AddPropertyScreen: View {
                             if currentStep == 1 {
                                 AddPropertyStep1View(formState: $formState)
                             } else {
-                                AddPropertyStep2View(formState: $formState)
+                                AddPropertyStep2View(
+                                    formState: $formState,
+                                    focusPurchasePrice: shouldFocusPurchasePrice
+                                )
                             }
                         }
                     }
@@ -73,6 +79,10 @@ struct AddPropertyScreen: View {
             .onAppear {
                 if let initial = initialFormState {
                     formState = initial
+                }
+                if startAtPurchasePrice {
+                    currentStep = 2
+                    shouldFocusPurchasePrice = true
                 }
             }
         }

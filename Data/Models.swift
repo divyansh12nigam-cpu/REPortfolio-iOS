@@ -22,7 +22,7 @@ enum PropertyCardVariant {
 // ─── Portfolio Property (card list item) ─────────────────────────────────────
 
 struct PortfolioProperty: Identifiable {
-    let id = UUID()
+    let id: String
     let title: String
     let status: String
     let estValue: String
@@ -34,6 +34,7 @@ struct PortfolioProperty: Identifiable {
     let isNew: Bool
 
     init(
+        id: String,
         title: String,
         status: String,
         estValue: String,
@@ -44,6 +45,7 @@ struct PortfolioProperty: Identifiable {
         actionLabel: String = "",
         isNew: Bool = false
     ) {
+        self.id = id
         self.title = title
         self.status = status
         self.estValue = estValue

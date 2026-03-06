@@ -4,6 +4,10 @@ struct PortfolioSummaryView: View {
     var onPropertyTap: (Int) -> Void = { _ in }
     var onAddClick: () -> Void = {}
     var onEditProperty: (Int) -> Void = { _ in }
+    /// Triggered by the "Add Purchase Price" strip — opens edit flow at Step 2, purchase price focused.
+    var onAddPurchasePrice: (Int) -> Void = { _ in }
+
+    @Environment(\.openURL) private var openURL
 
     @StateObject private var repository = PropertyRepository.shared
     @State private var apiSummary: PortfolioSummary? = nil
@@ -37,11 +41,37 @@ struct PortfolioSummaryView: View {
 
                     // Property cards
                     ForEach(Array(properties.enumerated()), id: \.element.id) { index, property in
-                        SwipeableCardView(
-                            onEdit: { onEditProperty(index) },
-                            onDelete: { propertyToDeleteIndex = index }
-                        ) {
-                            PortfolioPropertyCardView(property: property, onClick: { onPropertyTap(index) })
+                        let stripSpacing: CGFloat = property.cardVariant == .addPurchasePrice
+                            ? -Spacing.l : -Spacing.xxl
+
+                        VStack(spacing: property.cardVariant == .plain ? 0 : stripSpacing) {
+                            SwipeableCardView(
+                                onEdit: { onEditProperty(index) },
+                                onDelete: { propertyToDeleteIndex = index }
+                            ) {
+                                PropertyCardBodyView(
+                                    property: property,
+                                    onClick: { onPropertyTap(index) }
+                                )
+                            }
+                            .zIndex(2)
+
+                            PropertyCardStripView(
+                                property: property,
+                                onInsightTap: {
+                                    guard index < repository.propertyInputs.count,
+                                          let url = NinetyNineAcresURL.search(for: repository.propertyInputs[index])
+                                    else { return }
+                                    openURL(url)
+                                },
+                                onPostNowTap: {
+                                    openURL(NinetyNineAcresURL.postProperty)
+                                },
+                                onAddPurchasePriceTap: {
+                                    onAddPurchasePrice(index)
+                                }
+                            )
+                            .zIndex(1)
                         }
                         .padding(.horizontal, Spacing.xxxl)
                         .padding(.bottom, Spacing.xxxl)

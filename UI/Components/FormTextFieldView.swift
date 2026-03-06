@@ -7,6 +7,10 @@ struct FormTextFieldView: View {
     var prefix: String = ""
     var keyboardType: UIKeyboardType = .default
     var helperText: String = ""
+    /// Optional external focus trigger. Set to `true` to programmatically focus this field.
+    var isFocused: Binding<Bool>? = nil
+
+    @FocusState private var localFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.l) {
@@ -24,6 +28,10 @@ struct FormTextFieldView: View {
                     .font(Typography.bodyMedium)
                     .foregroundColor(.textPrimary)
                     .keyboardType(keyboardType)
+                    .focused($localFocused)
+                    .onChange(of: isFocused?.wrappedValue ?? false) { newValue in
+                        if newValue { localFocused = true }
+                    }
             }
             .padding(.horizontal, Spacing.xxl)
             .padding(.vertical, Spacing.xl)

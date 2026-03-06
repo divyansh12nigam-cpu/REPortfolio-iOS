@@ -102,6 +102,7 @@ enum SamplePortfolioData {
                 insightText = ""
             }
             return PortfolioProperty(
+                id: v.input.projectName,
                 title: v.input.projectName,
                 status: v.input.monthlyRent > 0 ? "On Rent" : "Self Use",
                 estValue: Formatters.formatValueRange(low: v.lowValue, high: v.highValue),

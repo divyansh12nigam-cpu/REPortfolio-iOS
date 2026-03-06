@@ -2,6 +2,10 @@ import SwiftUI
 
 struct AddPropertyStep2View: View {
     @Binding var formState: OnboardingFormState
+    /// When `true`, the purchase price field is auto-focused on appear.
+    var focusPurchasePrice: Bool = false
+
+    @State private var purchasePriceIsFocused = false
 
     private var propertyDescription: String {
         var parts: [String] = []
@@ -44,7 +48,8 @@ struct AddPropertyStep2View: View {
                         value: $formState.purchasePrice,
                         placeholder: "Invested value",
                         prefix: "₹",
-                        keyboardType: .numberPad
+                        keyboardType: .numberPad,
+                        isFocused: $purchasePriceIsFocused
                     )
 
                     FormTextFieldView(
@@ -79,5 +84,12 @@ struct AddPropertyStep2View: View {
         }
         .padding(.horizontal, Spacing.xxxl)
         .padding(.top, Spacing.widgetsXs)
+        .onAppear {
+            guard focusPurchasePrice else { return }
+            // Small delay lets the scroll view settle before the keyboard appears
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                purchasePriceIsFocused = true
+            }
+        }
     }
 }

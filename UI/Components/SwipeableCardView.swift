@@ -17,40 +17,40 @@ struct SwipeableCardView<Content: View>: View {
         ZStack(alignment: .trailing) {
             // Action buttons (behind card) — only rendered when swiping
             if offset < 0 {
-            HStack(spacing: 0) {
-                Button(action: {
-                    close()
-                    onEdit()
-                }) {
-                    VStack(spacing: Spacing.s) {
-                        Image(systemName: "pencil")
-                            .font(.system(size: 20, weight: .medium))
-                        Text("Edit")
-                            .font(Typography.captionMed)
+                HStack(spacing: 0) {
+                    Button(action: {
+                        close()
+                        onEdit()
+                    }) {
+                        VStack(spacing: Spacing.s) {
+                            Image(systemName: "pencil")
+                                .font(.system(size: 20, weight: .medium))
+                            Text("Edit")
+                                .font(Typography.captionMed)
+                        }
+                        .foregroundColor(.surfaceWhite)
+                        .frame(width: actionWidth)
+                        .frame(maxHeight: .infinity)
+                        .background(Color.brandPrimary)
                     }
-                    .foregroundColor(.surfaceWhite)
-                    .frame(width: actionWidth)
-                    .frame(maxHeight: .infinity)
-                    .background(Color.brandPrimary)
-                }
 
-                Button(action: {
-                    close()
-                    onDelete()
-                }) {
-                    VStack(spacing: Spacing.s) {
-                        Image(systemName: "trash")
-                            .font(.system(size: 20, weight: .medium))
-                        Text("Delete")
-                            .font(Typography.captionMed)
+                    Button(action: {
+                        close()
+                        onDelete()
+                    }) {
+                        VStack(spacing: Spacing.s) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 20, weight: .medium))
+                            Text("Delete")
+                                .font(Typography.captionMed)
+                        }
+                        .foregroundColor(.surfaceWhite)
+                        .frame(width: actionWidth)
+                        .frame(maxHeight: .infinity)
+                        .background(Color.errorRed)
                     }
-                    .foregroundColor(.surfaceWhite)
-                    .frame(width: actionWidth)
-                    .frame(maxHeight: .infinity)
-                    .background(Color.errorRed)
                 }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: Radius.card))
+                .clipShape(RoundedRectangle(cornerRadius: Radius.card))
             }
 
             // Card content on top
@@ -61,25 +61,21 @@ struct SwipeableCardView<Content: View>: View {
                         .onChanged { value in
                             let translation = value.translation.width
                             if isOpen {
-                                // Already open — allow dragging back closed or further
                                 let newOffset = -revealWidth + translation
                                 offset = min(0, max(-revealWidth, newOffset))
                             } else {
-                                // Only allow left-swipe (negative)
                                 offset = min(0, translation)
                             }
                         }
                         .onEnded { value in
                             let translation = value.translation.width
                             if isOpen {
-                                // If dragged right past threshold, close
                                 if translation > revealWidth * snapThreshold {
                                     close()
                                 } else {
                                     open()
                                 }
                             } else {
-                                // If dragged left past threshold, open
                                 if -translation > revealWidth * snapThreshold {
                                     open()
                                 } else {

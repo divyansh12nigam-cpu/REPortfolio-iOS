@@ -1,24 +1,35 @@
 import SwiftUI
 
-// ─── Entry point — dispatches to variant ─────────────────────────────────────
+// ─── Entry point — convenience wrapper (used by previews) ────────────────────
 
 struct PortfolioPropertyCardView: View {
     let property: PortfolioProperty
     var onClick: () -> Void = {}
+    var onInsightTap: (() -> Void)? = nil
+    var onPostNowTap: (() -> Void)? = nil
+    var onAddPurchasePriceTap: (() -> Void)? = nil
 
     var body: some View {
-        switch property.cardVariant {
-        case .plain:            PlainCardView(property: property, onClick: onClick)
-        case .insight:          InsightCardView(property: property, onClick: onClick)
-        case .insightAction:    InsightActionCardView(property: property, onClick: onClick)
-        case .addPurchasePrice: AddPurchasePriceCardView(property: property, onClick: onClick)
+        let stripSpacing: CGFloat = property.cardVariant == .addPurchasePrice
+            ? -Spacing.l : -Spacing.xxl
+
+        VStack(spacing: property.cardVariant == .plain ? 0 : stripSpacing) {
+            PropertyCardBodyView(property: property, onClick: onClick)
+                .zIndex(2)
+            PropertyCardStripView(
+                property: property,
+                onInsightTap: onInsightTap,
+                onPostNowTap: onPostNowTap,
+                onAddPurchasePriceTap: onAddPurchasePriceTap
+            )
+            .zIndex(1)
         }
     }
 }
 
-// ─── Shared card body ─────────────────────────────────────────────────────────
+// ─── Card body — exposed for PortfolioSummaryView to use directly ────────────
 
-private struct CardBodyView: View {
+struct PropertyCardBodyView: View {
     let property: PortfolioProperty
     let onClick: () -> Void
 
@@ -51,7 +62,6 @@ private struct CardBodyView: View {
 
             // 3-column stats
             HStack(alignment: .top) {
-                // Est. Value — mixed font sizes ("₹ 1.4 - 1.7" large + "Cr" small)
                 VStack(alignment: .leading, spacing: Spacing.s) {
                     estValueText
                     Text("Est. Value").font(Typography.bodySmall).foregroundColor(.textSecondary)
@@ -73,6 +83,7 @@ private struct CardBodyView: View {
                 .stroke(Color.borderSubtle, lineWidth: 1)
         )
         .shadow(color: .shadowNeutralLow, radius: Elevation.cardShadow, x: 0, y: 2)
+        .contentShape(RoundedRectangle(cornerRadius: Radius.card))
         .onTapGesture(perform: onClick)
     }
 
@@ -102,41 +113,30 @@ private struct CardBodyView: View {
     }
 }
 
-private struct StatColumn: View {
-    let label: String
-    let value: String
+// ─── Strip view — renders the appropriate strip based on variant ─────────────
+
+struct PropertyCardStripView: View {
+    let property: PortfolioProperty
+    var onInsightTap: (() -> Void)? = nil
+    var onPostNowTap: (() -> Void)? = nil
+    var onAddPurchasePriceTap: (() -> Void)? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.s) {
-            Text(value).font(Typography.bodyLarge).foregroundColor(.textPrimary)
-            Text(label).font(Typography.bodySmall).foregroundColor(.textSecondary)
+        switch property.cardVariant {
+        case .plain:
+            EmptyView()
+        case .insight:
+            insightStrip
+        case .insightAction:
+            insightActionStrip
+        case .addPurchasePrice:
+            addPurchasePriceStrip
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
-}
 
-// ─── Variant 1: PLAIN ─────────────────────────────────────────────────────────
-
-private struct PlainCardView: View {
-    let property: PortfolioProperty
-    let onClick: () -> Void
-    var body: some View {
-        CardBodyView(property: property, onClick: onClick)
-    }
-}
-
-// ─── Variant 2: INSIGHT — white→purple gradient strip ────────────────────────
-
-private struct InsightCardView: View {
-    let property: PortfolioProperty
-    let onClick: () -> Void
-
-    var body: some View {
-        VStack(spacing: 0) {
-            CardBodyView(property: property, onClick: onClick)
-                .zIndex(2)
-
-            // Purple gradient strip — peeks Spacing.xxl behind the card
+    // Purple gradient strip
+    private var insightStrip: some View {
+        Button(action: { onInsightTap?() }) {
             HStack {
                 HStack(spacing: Spacing.m) {
                     Image(systemName: "sparkles")
@@ -167,30 +167,20 @@ private struct InsightCardView: View {
                     bottomTrailingRadius: Radius.element
                 )
             )
-            .offset(y: -Spacing.xxl)   // pulls strip UP behind card
-            .zIndex(1)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
-}
 
-// ─── Variant 3: INSIGHT_ACTION — blue strip + "Post now" pill ────────────────
+    // Blue strip with "Post now" pill
+    private var insightActionStrip: some View {
+        HStack(spacing: Spacing.xl) {
+            Text(property.insightText)
+                .font(Typography.bodySmallThin)
+                .foregroundColor(.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-private struct InsightActionCardView: View {
-    let property: PortfolioProperty
-    let onClick: () -> Void
-
-    var body: some View {
-        VStack(spacing: 0) {
-            CardBodyView(property: property, onClick: onClick)
-                .zIndex(2)
-
-            HStack(spacing: Spacing.xl) {
-                Text(property.insightText)
-                    .font(Typography.bodySmallThin)
-                    .foregroundColor(.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                // White pill "Post now" button
+            Button(action: { onPostNowTap?() }) {
                 HStack(spacing: Spacing.s) {
                     Image(systemName: "plus")
                         .font(.system(size: 14, weight: .medium))
@@ -204,35 +194,26 @@ private struct InsightActionCardView: View {
                 .frame(height: Spacing.widgetsXs)
                 .background(Color.surfaceWhite)
                 .clipShape(Capsule())
+                .contentShape(Capsule())
             }
-            .padding(.horizontal, Spacing.xxl)
-            .padding(.top, Spacing.widgetsXs)
-            .padding(.bottom, Spacing.xl)
-            .frame(maxWidth: .infinity)
-            .background(Color.insightAccentBg)
-            .clipShape(
-                UnevenRoundedRectangle(
-                    bottomLeadingRadius: Radius.element,
-                    bottomTrailingRadius: Radius.element
-                )
-            )
-            .offset(y: -Spacing.xxl)   // pulls strip UP behind card
-            .zIndex(1)
+            .buttonStyle(.plain)
         }
+        .padding(.horizontal, Spacing.xxl)
+        .padding(.top, Spacing.widgetsXs)
+        .padding(.bottom, Spacing.xl)
+        .frame(maxWidth: .infinity)
+        .background(Color.insightAccentBg)
+        .clipShape(
+            UnevenRoundedRectangle(
+                bottomLeadingRadius: Radius.element,
+                bottomTrailingRadius: Radius.element
+            )
+        )
     }
-}
 
-// ─── Variant 4: ADD_PURCHASE_PRICE — gray + purple border strip ───────────────
-
-private struct AddPurchasePriceCardView: View {
-    let property: PortfolioProperty
-    let onClick: () -> Void
-
-    var body: some View {
-        VStack(spacing: 0) {
-            CardBodyView(property: property, onClick: onClick)
-                .zIndex(2)
-
+    // Gray strip with purple border
+    private var addPurchasePriceStrip: some View {
+        Button(action: { onAddPurchasePriceTap?() }) {
             HStack(alignment: .top, spacing: Spacing.l) {
                 Image(systemName: "plus.circle")
                     .font(.system(size: 20))
@@ -265,9 +246,24 @@ private struct AddPurchasePriceCardView: View {
                 )
                 .stroke(Color.purpleLight, lineWidth: 1)
             )
-            .offset(y: -Spacing.l)   // pulls strip UP behind card
-            .zIndex(1)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+    }
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+private struct StatColumn: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.s) {
+            Text(value).font(Typography.bodyLarge).foregroundColor(.textPrimary)
+            Text(label).font(Typography.bodySmall).foregroundColor(.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

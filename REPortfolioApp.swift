@@ -14,6 +14,8 @@ enum AppScreen: Equatable {
     case propertyDetail(index: Int)
     case addProperty
     case editProperty(index: Int)
+    /// Edit flow opened from the "Add Purchase Price" card strip — jumps to Step 2, focuses purchase price.
+    case editPropertyPurchasePrice(index: Int)
 }
 
 struct RootNavigationView: View {
@@ -25,7 +27,8 @@ struct RootNavigationView: View {
             PortfolioSummaryView(
                 onPropertyTap: { index in activeScreen = .propertyDetail(index: index) },
                 onAddClick: { activeScreen = .addProperty },
-                onEditProperty: { index in activeScreen = .editProperty(index: index) }
+                onEditProperty: { index in activeScreen = .editProperty(index: index) },
+                onAddPurchasePrice: { index in activeScreen = .editPropertyPurchasePrice(index: index) }
             )
 
             if case .propertyDetail(let index) = activeScreen {
@@ -57,6 +60,20 @@ struct RootNavigationView: View {
                     initialFormState: repository.propertyInputs.indices.contains(index)
                         ? repository.propertyInputs[index].toFormState()
                         : nil
+                )
+                .swipeBack(onBack: { activeScreen = .portfolio })
+                .transition(.move(edge: .trailing))
+            }
+
+            if case .editPropertyPurchasePrice(let index) = activeScreen {
+                AddPropertyScreen(
+                    onComplete: { activeScreen = .portfolio },
+                    onBack: { activeScreen = .portfolio },
+                    editingIndex: index,
+                    initialFormState: repository.propertyInputs.indices.contains(index)
+                        ? repository.propertyInputs[index].toFormState()
+                        : nil,
+                    startAtPurchasePrice: true
                 )
                 .swipeBack(onBack: { activeScreen = .portfolio })
                 .transition(.move(edge: .trailing))
