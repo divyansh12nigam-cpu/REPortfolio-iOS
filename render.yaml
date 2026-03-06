@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: reportfolio-valuation
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production

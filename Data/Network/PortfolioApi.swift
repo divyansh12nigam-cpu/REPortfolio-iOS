@@ -35,8 +35,11 @@ enum PortfolioApi {
 // ─── Valuation API (99acres valuation service on port 3001) ──────────────────
 
 enum ValuationApi {
-    // Use Mac's local IP — "localhost" only works in simulator, not on physical devices
-    private static let baseURL = URL(string: "http://10.112.4.43:3001")!
+    #if DEBUG
+    private static let baseURL = URL(string: "http://localhost:3001")!
+    #else
+    private static let baseURL = URL(string: "https://reportfolio-valuation.onrender.com")!
+    #endif
 
     /// Dedicated session with longer timeout — scraping multiple properties can take 60-90s.
     private static let session: URLSession = {

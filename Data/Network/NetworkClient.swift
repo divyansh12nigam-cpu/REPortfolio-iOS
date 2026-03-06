@@ -3,8 +3,11 @@ import Foundation
 /// URLSession-based network client — mirrors RetrofitClient.kt
 enum NetworkClient {
 
-    // Use Mac's local IP — "localhost" only works in simulator, not on physical devices
-    static let baseURL = URL(string: "http://10.112.4.43:3000/")!
+    #if DEBUG
+    static let baseURL = URL(string: "http://localhost:3001/")!
+    #else
+    static let baseURL = URL(string: "https://reportfolio-valuation.onrender.com/")!
+    #endif
 
     static let session: URLSession = {
         let config = URLSessionConfiguration.default

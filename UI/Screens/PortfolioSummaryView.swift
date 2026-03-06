@@ -47,6 +47,11 @@ struct PortfolioSummaryView: View {
                     // Hero section
                     PortfolioSummaryHeroView(summary: summary)
 
+                    // "Come back later" banner when estimates are loading
+                    if repository.isRefreshingValuations && realValuations == nil {
+                        valuationLoadingBanner
+                    }
+
                     // "YOUR PROPERTIES (N)" + "+ Add" row
                     propertiesSectionHeader
 
@@ -130,10 +135,27 @@ struct PortfolioSummaryView: View {
             }
         }
         .task(id: "valuation-\(repository.propertyInputs.count)") {
-            // Always refresh on launch — service caches internally, so this is cheap for repeat calls
+            // Refresh only when stale (every 15 days) or when no valuations exist
+            guard repository.isValuationStale else { return }
             print("[ValuationRefresh] Triggering refresh for \(repository.propertyInputs.count) properties")
             await repository.refreshValuations()
         }
+    }
+
+    private var valuationLoadingBanner: some View {
+        HStack(spacing: Spacing.l) {
+            ProgressView()
+                .tint(.textSecondary)
+            Text("Estimates are being prepared. Come back later to check estimates.")
+                .font(Typography.bodySmall)
+                .foregroundColor(.textSecondary)
+        }
+        .padding(Spacing.xxl)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.black.opacity(0.04))
+        .cornerRadius(8)
+        .padding(.horizontal, Spacing.xxxl)
+        .padding(.top, Spacing.l)
     }
 
     private var propertiesSectionHeader: some View {

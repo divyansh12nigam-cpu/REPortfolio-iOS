@@ -19,10 +19,10 @@ class PropertyRepository: ObservableObject {
     @Published var isRefreshingValuations: Bool = false
     private(set) var lastValuationRefresh: Date? = nil
 
-    /// Valuations older than 7 days are considered stale.
+    /// Valuations older than 15 days are considered stale (recheck twice a month).
     var isValuationStale: Bool {
         guard let last = lastValuationRefresh else { return true }
-        return Date().timeIntervalSince(last) > 7 * 24 * 3600
+        return Date().timeIntervalSince(last) > 15 * 24 * 3600
     }
 
     private init() {

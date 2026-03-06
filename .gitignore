@@ -28,3 +28,7 @@ Package.resolved
 # Misc
 xcuserdata/
 *.xcscmblueprint
+
+# Backend
+backend/node_modules/
+backend/.env
