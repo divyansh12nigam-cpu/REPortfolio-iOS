@@ -35,14 +35,13 @@ enum PortfolioApi {
 // ─── Valuation API (99acres valuation service on port 3001) ──────────────────
 
 enum ValuationApi {
-    // Use Mac's local IP — "localhost" only works in simulator, not on physical devices
-    private static let baseURL = URL(string: "http://10.112.4.43:3001")!
+    private static let baseURL = URL(string: "https://valuation-service-m8m9.onrender.com")!
 
-    /// Dedicated session with longer timeout — scraping multiple properties can take 60-90s.
+    /// Dedicated session with longer timeout — scraping can take 60-90s, plus Render cold starts (~50s).
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 120
-        config.timeoutIntervalForResource = 180
+        config.timeoutIntervalForRequest = 240
+        config.timeoutIntervalForResource = 300
         return URLSession(configuration: config)
     }()
 
@@ -54,7 +53,7 @@ enum ValuationApi {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 120
+        request.timeoutInterval = 240
 
         let body = ValuationBatchRequest(
             properties: inputs.map { p in

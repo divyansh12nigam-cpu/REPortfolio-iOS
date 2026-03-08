@@ -34,18 +34,28 @@ struct PropertyCardBodyView: View {
         VStack(spacing: 0) {
             // Title row + "New" tag + status badge
             HStack {
-                Text(property.title)
-                    .font(Typography.titleSmall)
-                    .foregroundColor(.textPrimary)
-                    .lineLimit(1)
-                if property.isNew {
-                    Text("New")
-                        .font(Typography.captionMed)
-                        .foregroundColor(.surfaceWhite)
-                        .padding(.horizontal, Spacing.l)
-                        .padding(.vertical, Spacing.xs)
-                        .background(Color.brandPrimary)
-                        .clipShape(Capsule())
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    HStack {
+                        Text(property.title)
+                            .font(Typography.titleSmall)
+                            .foregroundColor(.textPrimary)
+                            .lineLimit(1)
+                        if property.isNew {
+                            Text("New")
+                                .font(Typography.captionMed)
+                                .foregroundColor(.surfaceWhite)
+                                .padding(.horizontal, Spacing.l)
+                                .padding(.vertical, Spacing.xs)
+                                .background(Color.brandPrimary)
+                                .clipShape(Capsule())
+                        }
+                    }
+                    if !property.subtitle.isEmpty {
+                        Text(property.subtitle)
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textSecondary)
+                            .lineLimit(1)
+                    }
                 }
                 Spacer()
                 Text(property.status)

@@ -24,6 +24,7 @@ enum PropertyCardVariant {
 struct PortfolioProperty: Identifiable {
     let id: String
     let title: String
+    let subtitle: String
     let status: String
     let estValue: String
     let estGrowth: String
@@ -36,6 +37,7 @@ struct PortfolioProperty: Identifiable {
     init(
         id: String,
         title: String,
+        subtitle: String = "",
         status: String,
         estValue: String,
         estGrowth: String,
@@ -47,6 +49,7 @@ struct PortfolioProperty: Identifiable {
     ) {
         self.id = id
         self.title = title
+        self.subtitle = subtitle
         self.status = status
         self.estValue = estValue
         self.estGrowth = estGrowth

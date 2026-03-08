@@ -78,8 +78,8 @@ enum SamplePortfolioData {
         realValuations: [String: CachedValuation]? = nil
     ) -> [Valuation] {
         inputs.map { p in
-            // Use real 99acres valuation if available
-            if let real = realValuations?[p.projectName] {
+            // Use real 99acres valuation if available (skip zero-value results)
+            if let real = realValuations?[p.projectName], real.fairValue > 0 {
                 return Valuation(
                     input: p,
                     fairValue: real.fairValue,
@@ -128,9 +128,19 @@ enum SamplePortfolioData {
             default:
                 insightText = ""
             }
+            // Build subtitle: "SocietyName, Locality, City" or "Locality, City"
+            let subtitle: String = {
+                var parts: [String] = []
+                let society = v.input.societyName.trimmingCharacters(in: .whitespaces)
+                if !society.isEmpty { parts.append(society) }
+                if !v.input.locality.isEmpty { parts.append(v.input.locality) }
+                if !v.input.city.isEmpty { parts.append(v.input.city) }
+                return parts.joined(separator: ", ")
+            }()
             return PortfolioProperty(
                 id: v.input.projectName,
                 title: v.input.projectName,
+                subtitle: subtitle,
                 status: v.input.monthlyRent > 0 ? "On Rent" : "Self Use",
                 estValue: Formatters.formatValueRange(low: v.lowValue, high: v.highValue),
                 estGrowth: Formatters.formatAmount(v.growth),
@@ -185,7 +195,14 @@ enum SamplePortfolioData {
 
         return PropertyDetail(
             title: p.projectName,
-            location: "\(p.locality), \(p.city)",
+            location: {
+                var parts: [String] = []
+                let society = p.societyName.trimmingCharacters(in: .whitespaces)
+                if !society.isEmpty { parts.append(society) }
+                if !p.locality.isEmpty { parts.append(p.locality) }
+                if !p.city.isEmpty { parts.append(p.city) }
+                return parts.joined(separator: ", ")
+            }(),
             status: p.monthlyRent > 0 ? "Rent" : "Self Use",
             estValueRange: Formatters.formatValueRange(low: v.lowValue, high: v.highValue),
             invested: Formatters.formatAmount(Double(p.purchasePrice)),
