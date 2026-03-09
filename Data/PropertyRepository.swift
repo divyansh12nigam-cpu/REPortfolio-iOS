@@ -24,6 +24,11 @@ class PropertyRepository: ObservableObject {
     @Published var valuationState: ValuationState = .idle
     private(set) var lastValuationRefresh: Date? = nil
 
+    /// Per-card refresh tracking — property names currently being refreshed via swipe.
+    @Published var refreshingProperties: Set<String> = []
+    /// Context for the most recent successful refresh (triggers toast in UI).
+    @Published var lastRefreshContext: RefreshContext? = nil
+
     /// Valuations older than 7 days are considered stale.
     var isValuationStale: Bool {
         guard let last = lastValuationRefresh else { return true }
@@ -233,6 +238,7 @@ class PropertyRepository: ObservableObject {
 
             valuations = mergedValuations
             lastValuationRefresh = Date()
+            if force { lastRefreshContext = .allProperties }
             valuationState = .succeeded(at: Date())
             saveValuations()
             print("[ValuationRefresh] Updated \(mergedValuations.count) valuations")
@@ -248,17 +254,41 @@ class PropertyRepository: ObservableObject {
         }
     }
 
-    /// Refresh valuation for a single property (used by swipe-to-refresh and after adding a property).
-    /// Merges the result into existing valuations — doesn't wipe other properties.
+    /// Refresh valuation for a single property (used after adding a property or swipe-to-refresh).
+    /// Checks shared Supabase cache first (exact match or same-society fallback),
+    /// only scrapes 99acres if no cached value is available.
+    ///
+    /// - Parameter forceRefresh: Skip cache and always scrape. Used by swipe-to-refresh.
+    /// - Parameter cardRefresh: When true, shows "Calculating..." on that card instead of the global top banner.
     @MainActor
-    func refreshSingleValuation(for input: PropertyInput) async {
-        print("[ValuationRefresh] Refreshing single property: \(input.projectName)")
-        valuationState = .loading(startedAt: Date())
+    func refreshSingleValuation(for input: PropertyInput, forceRefresh: Bool = false, cardRefresh: Bool = false) async {
+        print("[ValuationRefresh] Refreshing single property: \(input.projectName) (force: \(forceRefresh), card: \(cardRefresh))")
+
+        if cardRefresh {
+            refreshingProperties.insert(input.projectName)
+        } else {
+            valuationState = .loading(startedAt: Date())
+        }
 
         do {
+            // Step 1: Check shared cache (exact match + society/BHK fallback)
+            if !forceRefresh {
+                if let cached = try? await SupabaseValuationCache.singleLookup(input: input) {
+                    print("[ValuationRefresh] Cache hit for \(input.projectName) — skipping scrape")
+                    valuations[input.projectName] = cached
+                    lastValuationRefresh = Date()
+                    if cardRefresh { refreshingProperties.remove(input.projectName) }
+                    // No lastRefreshContext here — toast only for actual scrapes, not cache hits
+                    valuationState = .succeeded(at: Date())
+                    saveValuations()
+                    return
+                }
+            }
+
+            // Step 2: No cache hit — scrape via backend
             let response = try await ValuationApi.fetchBatchValuation(
                 inputs: [input],
-                forceRefresh: true  // always force for explicit single-property refresh
+                forceRefresh: forceRefresh
             )
             var freshValuations: [String: CachedValuation] = [:]
             for v in response.valuations {
@@ -282,7 +312,7 @@ class PropertyRepository: ObservableObject {
                 valuations[v.projectName] = cached
             }
 
-            // Store in shared cache
+            // Store in shared cache (benefits other users + future BHK fallbacks)
             Task {
                 await SupabaseValuationCache.storeResults(
                     inputs: [input],
@@ -291,14 +321,18 @@ class PropertyRepository: ObservableObject {
             }
 
             lastValuationRefresh = Date()
+            if cardRefresh { refreshingProperties.remove(input.projectName) }
+            lastRefreshContext = .singleProperty(name: input.projectName)
             valuationState = .succeeded(at: Date())
             saveValuations()
             print("[ValuationRefresh] Updated valuation for \(input.projectName)")
         } catch let error as ValuationError {
             print("[ValuationRefresh] Single refresh failed: \(error.userMessage)")
+            if cardRefresh { refreshingProperties.remove(input.projectName) }
             valuationState = .failed(error: error, at: Date())
         } catch {
             print("[ValuationRefresh] Single refresh failed: \(error)")
+            if cardRefresh { refreshingProperties.remove(input.projectName) }
             valuationState = .failed(
                 error: .networkError(error.localizedDescription),
                 at: Date()

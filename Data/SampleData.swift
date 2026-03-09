@@ -179,18 +179,24 @@ enum SamplePortfolioData {
         for inputs: [PropertyInput],
         newCount: Int = 0,
         realValuations: [String: CachedValuation]? = nil,
-        valuationState: ValuationState = .idle
+        valuationState: ValuationState = .idle,
+        refreshingProperties: Set<String> = []
     ) -> [PortfolioProperty] {
         let strips = assignInsightStrips(for: inputs)
         return valuations(for: inputs, realValuations: realValuations).enumerated().map { i, v in
             let isNew = i < newCount
             let hasRealValuation = realValuations?[v.input.projectName] != nil
             let isPending: Bool
-            switch valuationState {
-            case .idle, .loading:
-                isPending = isNew && !hasRealValuation
-            case .succeeded, .failed:
-                isPending = false
+            if refreshingProperties.contains(v.input.projectName) {
+                // Per-card swipe-to-refresh in progress
+                isPending = true
+            } else {
+                switch valuationState {
+                case .idle, .loading:
+                    isPending = isNew && !hasRealValuation
+                case .succeeded, .failed:
+                    isPending = false
+                }
             }
             let strip = strips[i]
             let variant = strip.variant

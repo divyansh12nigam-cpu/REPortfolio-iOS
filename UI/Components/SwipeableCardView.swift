@@ -10,10 +10,12 @@ struct SwipeableCardView<Content: View>: View {
     @State private var offset: CGFloat = 0
     @State private var openSide: OpenSide = .none
     @State private var dragDirection: DragDirection = .undecided
+    @State private var cardHeight: CGFloat = 0
 
-    private let actionWidth: CGFloat = 80
-    private var trailingRevealWidth: CGFloat { actionWidth * 2 }  // Edit + Delete
-    private var leadingRevealWidth: CGFloat { actionWidth }        // Refresh only
+    private let actionWidth: CGFloat = 76
+    private let actionSpacing: CGFloat = Spacing.xs
+    private var trailingRevealWidth: CGFloat { actionWidth * 2 + actionSpacing }
+    private var leadingRevealWidth: CGFloat { actionWidth }
     private let snapThreshold: CGFloat = 0.4
 
     private enum OpenSide {
@@ -36,7 +38,7 @@ struct SwipeableCardView<Content: View>: View {
                     }) {
                         VStack(spacing: Spacing.s) {
                             Image(systemName: "pencil")
-                                .font(.system(size: 20, weight: .medium))
+                                .font(.system(size: 18, weight: .medium))
                             Text("Edit")
                                 .font(Typography.captionMed)
                         }
@@ -52,7 +54,7 @@ struct SwipeableCardView<Content: View>: View {
                     }) {
                         VStack(spacing: Spacing.s) {
                             Image(systemName: "trash")
-                                .font(.system(size: 20, weight: .medium))
+                                .font(.system(size: 18, weight: .medium))
                             Text("Delete")
                                 .font(Typography.captionMed)
                         }
@@ -74,22 +76,28 @@ struct SwipeableCardView<Content: View>: View {
                     }) {
                         VStack(spacing: Spacing.s) {
                             Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 20, weight: .medium))
+                                .font(.system(size: 18, weight: .medium))
                             Text("Refresh")
                                 .font(Typography.captionMed)
                         }
                         .foregroundColor(.surfaceWhite)
                         .frame(width: actionWidth)
-                        .frame(maxHeight: .infinity)
+                        .frame(height: cardHeight > 0 ? cardHeight : nil)
                         .background(Color.successGreen)
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
                     }
                     Spacer()
                 }
-                .clipShape(RoundedRectangle(cornerRadius: Radius.card))
             }
 
             // Card content on top
             content()
+                .background(
+                    GeometryReader { geo in
+                        Color.clear.preference(key: CardHeightPreferenceKey.self, value: geo.size.height)
+                    }
+                )
+                .onPreferenceChange(CardHeightPreferenceKey.self) { cardHeight = $0 }
                 .offset(x: offset)
                 .gesture(
                     DragGesture(minimumDistance: 20)
@@ -183,5 +191,12 @@ struct SwipeableCardView<Content: View>: View {
             offset = 0
             openSide = .none
         }
+    }
+}
+
+private struct CardHeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }

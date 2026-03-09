@@ -27,6 +27,7 @@
 		602C5AA5C33A3CC65625D1E6 /* REPortfolioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315589ABEC99C29D1C6854F3 /* REPortfolioApp.swift */; };
 		70E44B8429E62CFFC6666751 /* SignInScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEEAEE5D2852DFEB94E6E1A /* SignInScreen.swift */; };
 		7E4E73D2E9334497C356CD49 /* AutoSuggestTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1C77B80F5E6716C597CAD4 /* AutoSuggestTextFieldView.swift */; };
+		814E8F06BD664DDCB3230FA1 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9681A18E935837D2A361CC3 /* ToastView.swift */; };
 		841788BA6A225C5957AB9254 /* LocalDemandSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2BDE0DF015506C587FC6830 /* LocalDemandSectionView.swift */; };
 		897DD301804CF7ED460EF2AE /* AddPropertyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A9940135A374AD78A6DFB42 /* AddPropertyScreen.swift */; };
 		8EF614BC7EA8B727A12724A5 /* PropertyPreviewCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D099757DA068BFDC08007C /* PropertyPreviewCardView.swift */; };
@@ -96,6 +97,7 @@
 		DBFF345D22B917BA75BECEE0 /* InvestmentComparisonCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestmentComparisonCardView.swift; sourceTree = "<group>"; };
 		E899272FF3565F33FA8C8DA2 /* LocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationData.swift; sourceTree = "<group>"; };
 		E930C63B931614A7B8C84A3F /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		E9681A18E935837D2A361CC3 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		EE996D08F12C853443C878C5 /* ApiModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiModels.swift; sourceTree = "<group>"; };
 		F3E59342973AC42085D95474 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		F926B9C093B17F42224D3C3E /* StatusBarFadeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarFadeOverlay.swift; sourceTree = "<group>"; };
@@ -225,6 +227,7 @@
 				2812A6FFAD06A99E1D1AB091 /* StickyBottomButtonsView.swift */,
 				BC61B66A22B30C01FA06A745 /* SwipeableCardView.swift */,
 				B545525405133E628155CFFE /* SwipeBackModifier.swift */,
+				E9681A18E935837D2A361CC3 /* ToastView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				8FC9389C85064C9B7DAF1AB7 /* SupabaseValuationCache.swift in Sources */,
 				38209EFED3689A73E58D85FB /* SwipeBackModifier.swift in Sources */,
 				B5455A257E332F8F241C2559 /* SwipeableCardView.swift in Sources */,
+				814E8F06BD664DDCB3230FA1 /* ToastView.swift in Sources */,
 				9BAA81C2E79A288FAF746922 /* Tokens.swift in Sources */,
 				B7355FB96DC941CE0425F870 /* Typography.swift in Sources */,
 				BB8BF6C811B1ECB8FDC1C482 /* UrlBuilder.swift in Sources */,

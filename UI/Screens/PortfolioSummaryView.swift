@@ -15,6 +15,11 @@ struct PortfolioSummaryView: View {
     @State private var apiProperties: [PortfolioProperty]? = nil
     @State private var propertyToDeleteIndex: Int? = nil
 
+    // ─── Toast state ──────────────────────────────────────────────────────────
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var toastId = UUID()
+
     /// Real 99acres valuations from the valuation service (cached in repository).
     /// Nil when no cached valuations exist — falls back to hardcoded city prices.
     private var realValuations: [String: CachedValuation]? {
@@ -35,7 +40,8 @@ struct PortfolioSummaryView: View {
             for: repository.propertyInputs,
             newCount: repository.addedCount,
             realValuations: realValuations,
-            valuationState: repository.valuationState
+            valuationState: repository.valuationState,
+            refreshingProperties: repository.refreshingProperties
         )
     }
 
@@ -73,7 +79,9 @@ struct PortfolioSummaryView: View {
                                         Task {
                                             await repository.wakeServer()
                                             await repository.refreshSingleValuation(
-                                                for: repository.propertyInputs[index]
+                                                for: repository.propertyInputs[index],
+                                                forceRefresh: true,
+                                                cardRefresh: true
                                             )
                                         }
                                     }
@@ -176,6 +184,39 @@ struct PortfolioSummaryView: View {
             await repository.wakeServer()
             // Then refresh valuations
             await repository.refreshValuations()
+        }
+        .onChange(of: repository.lastRefreshContext) { newContext in
+            guard let context = newContext else { return }
+            switch context {
+            case .singleProperty(let name):
+                toastMessage = "Valuation updated for \(name)"
+            case .allProperties:
+                toastMessage = "All valuations updated"
+            }
+            repository.lastRefreshContext = nil
+
+            let currentId = UUID()
+            toastId = currentId
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showToast = true
+            }
+            Task {
+                try? await Task.sleep(for: .seconds(3))
+                if toastId == currentId {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        showToast = false
+                    }
+                }
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if showToast {
+                ToastView(message: toastMessage)
+                    .padding(.bottom, Spacing.widgetsM)
+                    .padding(.horizontal, Spacing.xxxl)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(100)
+            }
         }
     }
 

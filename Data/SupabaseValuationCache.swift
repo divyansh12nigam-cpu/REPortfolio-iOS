@@ -21,6 +21,104 @@ enum SupabaseValuationCache {
         return "\(society)|\(city)|\(locality)|\(fp)"
     }
 
+    // MARK: - Single lookup (exact match + society fallback)
+
+    /// Look up a single property in the shared cache.
+    /// 1. Exact match (same society + BHK)
+    /// 2. Society fallback (same society, any BHK — reuses price_per_sqft)
+    /// Returns a `CachedValuation` if found, nil otherwise.
+    static func singleLookup(input: PropertyInput) async throws -> CachedValuation? {
+        let society = input.societyName.trimmingCharacters(in: .whitespaces).lowercased()
+        let city = input.city.lowercased()
+        let locality = input.locality.lowercased()
+
+        guard !society.isEmpty else { return nil }
+
+        // Query all rows for this society+city+locality (any floorPlan)
+        let rows: [ValuationCacheRow] = try await SupabaseManager.client
+            .from("valuation_cache")
+            .select()
+            .ilike("society_name", value: society)
+            .ilike("city", value: city)
+            .ilike("locality", value: locality)
+            .execute()
+            .value
+
+        guard !rows.isEmpty else {
+            print("[ValuationCache] Single lookup miss: \(society)")
+            return nil
+        }
+
+        let exactKey = cacheKey(for: input)
+        let area = Double(max(input.areaSqft, 1000))
+
+        // Prefer exact match (same BHK)
+        if let exact = rows.first(where: { $0.cacheKey == exactKey }),
+           Date().timeIntervalSince(exact.fetchedAt) < cacheTTL {
+            print("[ValuationCache] Single lookup — exact hit: \(exactKey)")
+            return buildValuation(from: exact, area: area, purchasePrice: input.purchasePrice)
+        }
+
+        // Fallback: any fresh row from the same society — reuse price_per_sqft
+        if let fallback = rows
+            .filter({ Date().timeIntervalSince($0.fetchedAt) < cacheTTL })
+            .sorted(by: { $0.fetchedAt > $1.fetchedAt })  // most recent first
+            .first {
+            print("[ValuationCache] Single lookup — society fallback (\(fallback.floorPlan ?? "?") → \(input.floorPlan?.rawValue ?? "?")): reusing ₹\(Int(fallback.pricePerSqft))/sqft")
+            return buildValuation(from: fallback, area: area, purchasePrice: input.purchasePrice, isSocietyFallback: true)
+        }
+
+        print("[ValuationCache] Single lookup — all rows expired for \(society)")
+        return nil
+    }
+
+    /// Build a CachedValuation from a cache row, scaled to the given area.
+    /// For exact matches, uses the original low/high from the backend.
+    /// For society fallbacks (different BHK/area), recomputes from price_per_sqft × area with ±5%.
+    private static func buildValuation(
+        from row: ValuationCacheRow,
+        area: Double,
+        purchasePrice: Int64,
+        isSocietyFallback: Bool = false
+    ) -> CachedValuation {
+        let valueLow: Double
+        let valueHigh: Double
+        let fairValue: Double
+
+        if isSocietyFallback {
+            // Different config — recompute from price_per_sqft × new area
+            fairValue = row.pricePerSqft * area
+            valueLow = fairValue * 0.95
+            valueHigh = fairValue * 1.05
+        } else {
+            // Exact match — preserve original range from backend
+            valueLow = row.valueLow
+            valueHigh = row.valueHigh
+            fairValue = row.fairValue
+        }
+
+        let growth = valueHigh - Double(purchasePrice)
+
+        return CachedValuation(
+            valueLow: valueLow,
+            valueHigh: valueHigh,
+            fairValue: fairValue,
+            pricePerSqft: row.pricePerSqft,
+            growth: growth,
+            growthPercent: purchasePrice > 0 ? (growth / Double(purchasePrice)) * 100 : 0,
+            source: isSocietyFallback ? "\(row.source) (same society, different config)" : row.source,
+            confidence: isSocietyFallback ? "medium" : row.confidence,
+            comparableCount: row.comparableCount,
+            bhkFiltered: row.bhkFiltered,
+            sizeFiltered: row.sizeFiltered,
+            filterFallback: isSocietyFallback ? "society_bhk_fallback" : row.filterFallback,
+            warnings: isSocietyFallback
+                ? row.warnings + ["Estimated from \(row.floorPlan ?? "other") config in same society"]
+                : row.warnings,
+            fetchedAt: row.fetchedAt
+        )
+    }
+
     // MARK: - Batch lookup
 
     /// Look up cached valuations for a list of properties.
@@ -54,17 +152,13 @@ enum SupabaseValuationCache {
                 continue
             }
 
-            // Scale price_per_sqft to this property's area
-            let area = Double(max(input.areaSqft, 1000)) // fallback 1000 sqft if no area
-            let fairValue = row.pricePerSqft * area
-            let valueLow = fairValue * 0.95
-            let valueHigh = fairValue * 1.05
-            let growth = valueHigh - Double(input.purchasePrice)
+            // Use the original low/high from the backend (preserves real range)
+            let growth = row.valueHigh - Double(input.purchasePrice)
 
             result[input.projectName] = CachedValuation(
-                valueLow: valueLow,
-                valueHigh: valueHigh,
-                fairValue: fairValue,
+                valueLow: row.valueLow,
+                valueHigh: row.valueHigh,
+                fairValue: row.fairValue,
                 pricePerSqft: row.pricePerSqft,
                 growth: growth,
                 growthPercent: input.purchasePrice > 0

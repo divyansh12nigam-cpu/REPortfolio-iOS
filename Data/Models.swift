@@ -117,6 +117,12 @@ enum ValuationState: Equatable {
     case failed(error: ValuationError, at: Date)
 }
 
+/// Context for toast display — identifies what triggered the last successful valuation refresh.
+enum RefreshContext: Equatable {
+    case singleProperty(name: String)
+    case allProperties
+}
+
 enum ValuationError: Error, Equatable {
     case networkError(String)
     case timeout
