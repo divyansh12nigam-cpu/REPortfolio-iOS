@@ -12,9 +12,9 @@ struct SwipeableCardView<Content: View>: View {
     @State private var dragDirection: DragDirection = .undecided
     @State private var cardHeight: CGFloat = 0
 
-    private let actionWidth: CGFloat = 76
-    private var trailingRevealWidth: CGFloat { actionWidth * 2 + Spacing.l * 2 }
-    private var leadingRevealWidth: CGFloat { actionWidth + Spacing.l }
+    private let buttonSize: CGFloat = 56
+    private var trailingRevealWidth: CGFloat { buttonSize * 2 + Spacing.l * 2 }
+    private var leadingRevealWidth: CGFloat { buttonSize + Spacing.l }
     private let snapThreshold: CGFloat = 0.4
 
     private enum OpenSide {
@@ -35,34 +35,24 @@ struct SwipeableCardView<Content: View>: View {
                         close()
                         onEdit()
                     }) {
-                        VStack(spacing: Spacing.s) {
-                            Image(systemName: "pencil")
-                                .font(.system(size: 18, weight: .medium))
-                            Text("Edit")
-                                .font(Typography.captionMed)
-                        }
-                        .foregroundColor(.surfaceWhite)
-                        .frame(width: actionWidth)
-                        .frame(maxHeight: .infinity)
-                        .background(Color.brandPrimary)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
+                        Image(systemName: "pencil")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.surfaceWhite)
+                            .frame(width: buttonSize, height: buttonSize)
+                            .background(Color.brandPrimary)
+                            .clipShape(Circle())
                     }
 
                     Button(action: {
                         close()
                         onDelete()
                     }) {
-                        VStack(spacing: Spacing.s) {
-                            Image(systemName: "trash")
-                                .font(.system(size: 18, weight: .medium))
-                            Text("Delete")
-                                .font(Typography.captionMed)
-                        }
-                        .foregroundColor(.surfaceWhite)
-                        .frame(width: actionWidth)
-                        .frame(maxHeight: .infinity)
-                        .background(Color.errorRed)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
+                        Image(systemName: "trash")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.surfaceWhite)
+                            .frame(width: buttonSize, height: buttonSize)
+                            .background(Color.errorRed)
+                            .clipShape(Circle())
                     }
                 }
                 .padding(.leading, Spacing.l)
@@ -75,17 +65,12 @@ struct SwipeableCardView<Content: View>: View {
                         close()
                         onRefresh?()
                     }) {
-                        VStack(spacing: Spacing.s) {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 18, weight: .medium))
-                            Text("Refresh")
-                                .font(Typography.captionMed)
-                        }
-                        .foregroundColor(.surfaceWhite)
-                        .frame(width: actionWidth)
-                        .frame(maxHeight: .infinity)
-                        .background(Color.successGreen)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.surfaceWhite)
+                            .frame(width: buttonSize, height: buttonSize)
+                            .background(Color.successGreen)
+                            .clipShape(Circle())
                     }
                     Spacer()
                 }
