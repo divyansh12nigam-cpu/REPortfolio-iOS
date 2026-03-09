@@ -25,6 +25,13 @@ Package.resolved
 *.swp
 *~.nib
 
+# Supabase CLI
+supabase/.temp/
+supabase/config.toml
+
+# Claude Code
+.claude/
+
 # Misc
 xcuserdata/
 *.xcscmblueprint

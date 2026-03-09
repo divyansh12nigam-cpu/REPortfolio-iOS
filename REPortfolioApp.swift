@@ -2,9 +2,34 @@ import SwiftUI
 
 @main
 struct REPortfolioApp: App {
+    @StateObject private var authManager = AuthManager.shared
+
     var body: some Scene {
         WindowGroup {
-            RootNavigationView()
+            Group {
+                switch authManager.authState {
+                case .loading:
+                    // Splash / loading while checking Keychain session
+                    VStack {
+                        ProgressView()
+                        Text("Loading...")
+                            .font(Typography.bodySmall)
+                            .foregroundColor(.textSecondary)
+                            .padding(.top, Spacing.xxl)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.surfaceWhite)
+
+                case .signedOut:
+                    SignInScreen()
+
+                case .signedIn:
+                    RootNavigationView()
+                }
+            }
+            .task {
+                await authManager.checkSession()
+            }
         }
     }
 }
@@ -21,6 +46,7 @@ enum AppScreen: Equatable {
 struct RootNavigationView: View {
     @StateObject private var repository = PropertyRepository.shared
     @State private var activeScreen: AppScreen = .portfolio
+    @State private var hasSyncedFromCloud = false
 
     var body: some View {
         ZStack {
@@ -81,6 +107,11 @@ struct RootNavigationView: View {
             }
         }
         .animation(.easeInOut(duration: 0.28), value: activeScreen)
+        .task {
+            guard !hasSyncedFromCloud else { return }
+            hasSyncedFromCloud = true
+            await repository.syncFromCloud()
+        }
     }
 }
 

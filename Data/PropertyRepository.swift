@@ -2,6 +2,10 @@ import SwiftUI
 
 /// Mutable shared state holder for property inputs + cached valuations.
 /// Seeded from SamplePortfolioData, allows adding new properties from the onboarding flow.
+///
+/// Persistence strategy:
+/// - UserDefaults = offline fallback (always written)
+/// - Supabase = cloud source of truth (when authenticated)
 class PropertyRepository: ObservableObject {
     static let shared = PropertyRepository()
 
@@ -59,6 +63,7 @@ class PropertyRepository: ObservableObject {
         propertyInputs.insert(input, at: 0)
         addedCount += 1
         save()
+        syncToCloud()
     }
 
     func removeProperty(at index: Int) {
@@ -68,6 +73,7 @@ class PropertyRepository: ObservableObject {
         valuations.removeValue(forKey: removed.projectName)
         save()
         saveValuations()
+        syncToCloud()
     }
 
     func updateProperty(at index: Int, with input: PropertyInput) {
@@ -81,9 +87,62 @@ class PropertyRepository: ObservableObject {
         }
         save()
         saveValuations()
+        syncToCloud()
     }
 
-    // ─── Valuation refresh (calls 99acres valuation service) ─────────────────
+    // ─── Cloud sync ────────────────────────────────────────────────────────────
+
+    /// Upload all local properties to Supabase (fire-and-forget).
+    private func syncToCloud() {
+        let inputs = propertyInputs  // capture outside Task
+        Task { @MainActor in
+            guard let userId = AuthManager.shared.currentUserId,
+                  !AuthManager.shared.isOffline else { return }
+
+            do {
+                try await SupabasePropertyStore.replaceAll(
+                    userId: userId,
+                    inputs: inputs
+                )
+            } catch {
+                print("[CloudSync] Upload failed (non-fatal): \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Download properties from Supabase after sign-in.
+    /// - If cloud has data → replaces local.
+    /// - If cloud is empty but local has user-added data → uploads local (migration).
+    @MainActor
+    func syncFromCloud() async {
+        guard let userId = AuthManager.shared.currentUserId,
+              !AuthManager.shared.isOffline else { return }
+
+        do {
+            let cloudProperties = try await SupabasePropertyStore.fetchAll()
+
+            if !cloudProperties.isEmpty {
+                // Cloud has data — use it as source of truth
+                propertyInputs = cloudProperties
+                addedCount = cloudProperties.count  // all cloud properties are user-added
+                save()
+                print("[CloudSync] Downloaded \(cloudProperties.count) properties from cloud")
+            } else if addedCount > 0 {
+                // Cloud is empty but local has user-added data — migrate up
+                try await SupabasePropertyStore.replaceAll(
+                    userId: userId,
+                    inputs: propertyInputs
+                )
+                print("[CloudSync] Migrated \(propertyInputs.count) local properties to cloud")
+            } else {
+                print("[CloudSync] No cloud data and no local user data — keeping seed data")
+            }
+        } catch {
+            print("[CloudSync] Sync failed (using local data): \(error.localizedDescription)")
+        }
+    }
+
+    // ─── Valuation refresh (cache-aware) ───────────────────────────────────────
 
     /// Wake the Render server to reduce cold-start latency on the batch request.
     @MainActor
@@ -91,8 +150,11 @@ class PropertyRepository: ObservableObject {
         await ValuationApi.wake()
     }
 
-    /// Refresh valuations from the valuation service.
-    /// - Parameter force: If true, skips both local staleness check and server-side cache.
+    /// Refresh valuations using cache-aware flow:
+    /// 1. Check Supabase shared cache for hits
+    /// 2. Scrape only cache misses via Render valuation service
+    /// 3. Store fresh results in shared cache (benefits other users)
+    /// - Parameter force: If true, skips local staleness check and server-side cache.
     @MainActor
     func refreshValuations(force: Bool = false) async {
         // Skip if not stale (unless force refresh)
@@ -105,34 +167,66 @@ class PropertyRepository: ObservableObject {
         valuationState = .loading(startedAt: Date())
 
         do {
-            let response = try await ValuationApi.fetchBatchValuation(
-                inputs: propertyInputs,
-                forceRefresh: force
-            )
-            var newValuations: [String: CachedValuation] = [:]
-            for v in response.valuations {
-                newValuations[v.projectName] = CachedValuation(
-                    valueLow: v.valueLow,
-                    valueHigh: v.valueHigh,
-                    fairValue: v.fairValue,
-                    pricePerSqft: v.pricePerSqft,
-                    growth: v.growth,
-                    growthPercent: v.growthPercent,
-                    source: v.source,
-                    confidence: v.confidence,
-                    comparableCount: v.comparableCount,
-                    bhkFiltered: v.bhkFiltered ?? false,
-                    sizeFiltered: v.sizeFiltered ?? false,
-                    filterFallback: v.filterFallback ?? "none",
-                    warnings: v.warnings ?? [],
-                    fetchedAt: Date()
-                )
+            var mergedValuations: [String: CachedValuation] = [:]
+            var missedInputs = propertyInputs
+
+            // Step 1: Check Supabase shared cache (skip on force refresh or offline)
+            if !force && !AuthManager.shared.isOffline {
+                do {
+                    let cacheHits = try await SupabaseValuationCache.batchLookup(inputs: propertyInputs)
+                    mergedValuations.merge(cacheHits) { _, new in new }
+                    missedInputs = SupabaseValuationCache.cacheMisses(inputs: propertyInputs, hits: cacheHits)
+                    print("[ValuationRefresh] Cache hits: \(cacheHits.count), misses: \(missedInputs.count)")
+                } catch {
+                    print("[ValuationRefresh] Cache lookup failed (will scrape all): \(error.localizedDescription)")
+                    missedInputs = propertyInputs
+                }
             }
-            valuations = newValuations
+
+            // Step 2: Scrape only cache misses (or all if force)
+            if !missedInputs.isEmpty {
+                let response = try await ValuationApi.fetchBatchValuation(
+                    inputs: missedInputs,
+                    forceRefresh: force
+                )
+                var freshValuations: [String: CachedValuation] = [:]
+                for v in response.valuations {
+                    let cached = CachedValuation(
+                        valueLow: v.valueLow,
+                        valueHigh: v.valueHigh,
+                        fairValue: v.fairValue,
+                        pricePerSqft: v.pricePerSqft,
+                        growth: v.growth,
+                        growthPercent: v.growthPercent,
+                        source: v.source,
+                        confidence: v.confidence,
+                        comparableCount: v.comparableCount,
+                        bhkFiltered: v.bhkFiltered ?? false,
+                        sizeFiltered: v.sizeFiltered ?? false,
+                        filterFallback: v.filterFallback ?? "none",
+                        warnings: v.warnings ?? [],
+                        fetchedAt: Date()
+                    )
+                    freshValuations[v.projectName] = cached
+                    mergedValuations[v.projectName] = cached
+                }
+
+                // Step 3: Store fresh results in shared cache (benefits other users)
+                if !AuthManager.shared.isOffline {
+                    Task {
+                        await SupabaseValuationCache.storeResults(
+                            inputs: missedInputs,
+                            valuations: freshValuations
+                        )
+                    }
+                }
+            }
+
+            valuations = mergedValuations
             lastValuationRefresh = Date()
             valuationState = .succeeded(at: Date())
             saveValuations()
-            print("[ValuationRefresh] Updated \(newValuations.count) valuations")
+            print("[ValuationRefresh] Updated \(mergedValuations.count) valuations")
         } catch let error as ValuationError {
             print("[ValuationRefresh] Failed: \(error.userMessage)")
             valuationState = .failed(error: error, at: Date())
@@ -145,7 +239,7 @@ class PropertyRepository: ObservableObject {
         }
     }
 
-    // ─── Persistence ─────────────────────────────────────────────────────────
+    // ─── Persistence (UserDefaults — offline fallback) ─────────────────────────
 
     private func save() {
         if let data = try? JSONEncoder().encode(propertyInputs) {
