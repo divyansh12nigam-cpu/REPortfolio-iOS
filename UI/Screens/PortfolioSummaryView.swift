@@ -46,58 +46,63 @@ struct PortfolioSummaryView: View {
                     // Page header
                     PortfolioPageHeaderView(isRootScreen: true, onBack: onProfileTap)
 
-                    // Valuation status banner
-                    valuationBanner
+                    if properties.isEmpty {
+                        // Empty state for new users
+                        emptyStateView
+                    } else {
+                        // Valuation status banner
+                        valuationBanner
 
-                    // Hero section
-                    PortfolioSummaryHeroView(
-                        summary: summary,
-                        lastUpdated: repository.oldestValuationDate
-                    )
+                        // Hero section
+                        PortfolioSummaryHeroView(
+                            summary: summary,
+                            lastUpdated: repository.oldestValuationDate
+                        )
 
-                    // "YOUR PROPERTIES (N)" + "+ Add" row
-                    propertiesSectionHeader
+                        // "YOUR PROPERTIES (N)" + "+ Add" row
+                        propertiesSectionHeader
 
-                    // Property cards
-                    ForEach(Array(properties.enumerated()), id: \.element.id) { index, property in
-                        VStack(spacing: property.cardVariant == .plain ? 0 : -Spacing.xxl) {
-                            SwipeableCardView(
-                                onEdit: { onEditProperty(index) },
-                                onDelete: { propertyToDeleteIndex = index }
-                            ) {
-                                PropertyCardBodyView(
-                                    property: property,
-                                    onClick: { onPropertyTap(index) }
-                                )
-                            }
-                            .zIndex(2)
-
-                            PropertyCardStripView(
-                                property: property,
-                                onInsightTap: {
-                                    guard index < repository.propertyInputs.count,
-                                          let url = NinetyNineAcresURL.search(for: repository.propertyInputs[index])
-                                    else { return }
-                                    openURL(url)
-                                },
-                                onPostNowTap: {
-                                    openURL(NinetyNineAcresURL.postProperty)
-                                },
-                                onAddPurchasePriceTap: {
-                                    onAddPurchasePrice(index)
+                        // Property cards
+                        ForEach(Array(properties.enumerated()), id: \.element.id) { index, property in
+                            VStack(spacing: property.cardVariant == .plain ? 0 : -Spacing.xxl) {
+                                SwipeableCardView(
+                                    onEdit: { onEditProperty(index) },
+                                    onDelete: { propertyToDeleteIndex = index }
+                                ) {
+                                    PropertyCardBodyView(
+                                        property: property,
+                                        onClick: { onPropertyTap(index) }
+                                    )
                                 }
-                            )
-                            .zIndex(1)
+                                .zIndex(2)
+
+                                PropertyCardStripView(
+                                    property: property,
+                                    onInsightTap: {
+                                        guard index < repository.propertyInputs.count,
+                                              let url = NinetyNineAcresURL.search(for: repository.propertyInputs[index])
+                                        else { return }
+                                        openURL(url)
+                                    },
+                                    onPostNowTap: {
+                                        openURL(NinetyNineAcresURL.postProperty)
+                                    },
+                                    onAddPurchasePriceTap: {
+                                        onAddPurchasePrice(index)
+                                    }
+                                )
+                                .zIndex(1)
+                            }
+                            .padding(.horizontal, Spacing.xxxl)
+                            .padding(.bottom, Spacing.xxxl)
                         }
-                        .padding(.horizontal, Spacing.xxxl)
-                        .padding(.bottom, Spacing.xxxl)
+
+                        // Sticky bottom CTA (inside scroll on summary screen — matches Android)
+                        StickyBottomButtonsView()
+
+                        // Disclaimer
+                        DisclaimerFooterView()
                     }
-
-                    // Sticky bottom CTA (inside scroll on summary screen — matches Android)
-                    StickyBottomButtonsView()
-
-                    // Disclaimer
-                    DisclaimerFooterView()
                 }
             }
             .refreshable {
@@ -214,6 +219,45 @@ struct PortfolioSummaryView: View {
                 .background(Color(red: 1, green: 0.97, blue: 0.93))
             }
         }
+    }
+
+    private var emptyStateView: some View {
+        VStack(spacing: Spacing.xxl) {
+            Spacer().frame(height: Spacing.widgetsM)
+
+            Image(systemName: "building.2.fill")
+                .font(.system(size: 56))
+                .foregroundColor(.brandPrimary)
+
+            Text("Your portfolio is empty")
+                .font(Typography.bodyLarge)
+                .foregroundColor(.textPrimary)
+
+            Text("Add your first property to start\ntracking your real estate wealth")
+                .font(Typography.bodyMedium)
+                .foregroundColor(.textSecondary)
+                .multilineTextAlignment(.center)
+
+            Spacer().frame(height: Spacing.xl)
+
+            Button(action: onAddClick) {
+                HStack(spacing: Spacing.l) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16, weight: .semibold))
+                    Text("Add Property")
+                        .font(Typography.bodyLarge)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color.brandPrimary)
+                .cornerRadius(Radius.sm)
+            }
+            .padding(.horizontal, Spacing.xxxl)
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var propertiesSectionHeader: some View {

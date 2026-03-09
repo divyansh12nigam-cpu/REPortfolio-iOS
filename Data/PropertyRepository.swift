@@ -52,7 +52,7 @@ class PropertyRepository: ObservableObject {
             self.propertyInputs = saved
             self.addedCount = UserDefaults.standard.integer(forKey: Self.countKey)
         } else {
-            self.propertyInputs = SamplePortfolioData.propertyInputs
+            self.propertyInputs = []
         }
         loadValuations()
     }
