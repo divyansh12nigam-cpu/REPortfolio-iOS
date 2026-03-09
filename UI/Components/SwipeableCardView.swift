@@ -13,9 +13,8 @@ struct SwipeableCardView<Content: View>: View {
     @State private var cardHeight: CGFloat = 0
 
     private let actionWidth: CGFloat = 76
-    private let actionSpacing: CGFloat = Spacing.xs
-    private var trailingRevealWidth: CGFloat { actionWidth * 2 + actionSpacing }
-    private var leadingRevealWidth: CGFloat { actionWidth }
+    private var trailingRevealWidth: CGFloat { actionWidth * 2 + Spacing.l * 2 }
+    private var leadingRevealWidth: CGFloat { actionWidth + Spacing.l }
     private let snapThreshold: CGFloat = 0.4
 
     private enum OpenSide {
@@ -30,7 +29,7 @@ struct SwipeableCardView<Content: View>: View {
         ZStack {
             // Trailing actions (swipe left → Edit + Delete)
             if offset < 0 {
-                HStack(spacing: 0) {
+                HStack(spacing: Spacing.l) {
                     Spacer()
                     Button(action: {
                         close()
@@ -46,6 +45,7 @@ struct SwipeableCardView<Content: View>: View {
                         .frame(width: actionWidth)
                         .frame(maxHeight: .infinity)
                         .background(Color.brandPrimary)
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
                     }
 
                     Button(action: {
@@ -62,9 +62,10 @@ struct SwipeableCardView<Content: View>: View {
                         .frame(width: actionWidth)
                         .frame(maxHeight: .infinity)
                         .background(Color.errorRed)
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: Radius.card))
+                .padding(.leading, Spacing.l)
             }
 
             // Leading action (swipe right → Refresh)
@@ -84,10 +85,11 @@ struct SwipeableCardView<Content: View>: View {
                         .frame(width: actionWidth)
                         .frame(maxHeight: .infinity)
                         .background(Color.successGreen)
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
                     }
                     Spacer()
                 }
-                .clipShape(RoundedRectangle(cornerRadius: Radius.card))
+                .padding(.trailing, Spacing.l)
             }
 
             // Card content on top
