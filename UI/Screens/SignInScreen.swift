@@ -102,11 +102,20 @@ struct SignInScreen: View {
                 isSignUp.toggle()
                 authManager.errorMessage = nil
             }) {
-                Text(isSignUp
-                     ? "Already have an account? **Sign in**"
-                     : "Don't have an account? **Create one**")
-                    .font(Typography.bodySmall)
-                    .foregroundColor(.textSecondary)
+                Group {
+                    if isSignUp {
+                        Text("Already have an account? ")
+                            .foregroundColor(.textSecondary)
+                        + Text("Sign in")
+                            .foregroundColor(.brandPrimary)
+                    } else {
+                        Text("Don't have an account? ")
+                            .foregroundColor(.textSecondary)
+                        + Text("Create one")
+                            .foregroundColor(.brandPrimary)
+                    }
+                }
+                .font(Typography.bodySmall)
             }
 
             Spacer().frame(height: Spacing.xxxxl)
