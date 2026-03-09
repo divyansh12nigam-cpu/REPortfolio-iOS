@@ -144,8 +144,15 @@ struct PortfolioSummaryView: View {
                 let response = try await PortfolioApi.fetchSummary(inputs: repository.propertyInputs)
                 if !Task.isCancelled {
                     apiSummary    = response.summary.toUiSummary()
+                    let inputs = repository.propertyInputs
+                    let strips = SamplePortfolioData.assignInsightStrips(for: inputs)
                     apiProperties = response.properties.enumerated().map { i, p in
-                        p.toUiProperty(variant: .plain)
+                        let strip = i < strips.count ? strips[i] : (variant: PropertyCardVariant.plain, insightText: "", actionLabel: "")
+                        return p.toUiProperty(
+                            variant: strip.variant,
+                            insightText: strip.insightText,
+                            actionLabel: strip.actionLabel
+                        )
                     }
                 }
             } catch {

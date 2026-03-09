@@ -36,6 +36,7 @@
 		97988411B8087FA60AB4EB4A /* PropertyDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29423DC270ACF69FBFB1162 /* PropertyDetailView.swift */; };
 		987E7BEFEB339D3090B2BE94 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E59342973AC42085D95474 /* Colors.swift */; };
 		9969EBADC1BC86F12327DF10 /* ValuationApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A7B26DF56C81358117092B /* ValuationApi.swift */; };
+		9AE0FEC0930457F45E075FA3 /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F36EE6E0040DB4FD8546998 /* ProfileScreen.swift */; };
 		9BAA81C2E79A288FAF746922 /* Tokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D8E7936B0FD339B986AB842 /* Tokens.swift */; };
 		AC98FC134989E6B10494E6F3 /* PropertySummaryHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E0901D3FAECB8F66C613A73 /* PropertySummaryHeroView.swift */; };
 		B3F02EF95F0C1CC52BC58C40 /* PropertyDetailBottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2479252637DFA2B5B5C47949 /* PropertyDetailBottomBarView.swift */; };
@@ -71,6 +72,7 @@
 		476951C95F0C74EED7215FB9 /* PortfolioPropertyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPropertyCardView.swift; sourceTree = "<group>"; };
 		491C2E965F6B8B57696FA742 /* AddPropertyStep1View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPropertyStep1View.swift; sourceTree = "<group>"; };
 		49F2C13EA9AAA9CD6D191A7E /* PortfolioSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioSummaryView.swift; sourceTree = "<group>"; };
+		4F36EE6E0040DB4FD8546998 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyRepository.swift; sourceTree = "<group>"; };
 		596A688EE76D60D72F693960 /* ValuationApiModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationApiModels.swift; sourceTree = "<group>"; };
 		5F40E0D9C91F87081776D809 /* FormTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormTextFieldView.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 			children = (
 				6A9940135A374AD78A6DFB42 /* AddPropertyScreen.swift */,
 				49F2C13EA9AAA9CD6D191A7E /* PortfolioSummaryView.swift */,
+				4F36EE6E0040DB4FD8546998 /* ProfileScreen.swift */,
 				B29423DC270ACF69FBFB1162 /* PropertyDetailView.swift */,
 				3BEEAEE5D2852DFEB94E6E1A /* SignInScreen.swift */,
 			);
@@ -311,6 +314,7 @@
 				F6B836D02205FDEDE9BF8BF2 /* PortfolioPropertyCardView.swift in Sources */,
 				4821C00C2BF6598CB27FB998 /* PortfolioSummaryHeroView.swift in Sources */,
 				C98679A251FEE49C557D32B8 /* PortfolioSummaryView.swift in Sources */,
+				9AE0FEC0930457F45E075FA3 /* ProfileScreen.swift in Sources */,
 				B3F02EF95F0C1CC52BC58C40 /* PropertyDetailBottomBarView.swift in Sources */,
 				97988411B8087FA60AB4EB4A /* PropertyDetailView.swift in Sources */,
 				8EF614BC7EA8B727A12724A5 /* PropertyPreviewCardView.swift in Sources */,

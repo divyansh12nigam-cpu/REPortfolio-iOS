@@ -59,7 +59,11 @@ extension ApiSummary {
 }
 
 extension ApiProperty {
-    func toUiProperty(variant: PropertyCardVariant = .plain) -> PortfolioProperty {
+    func toUiProperty(
+        variant: PropertyCardVariant = .plain,
+        insightText: String = "",
+        actionLabel: String = ""
+    ) -> PortfolioProperty {
         PortfolioProperty(
             id: projectName,
             title: projectName,
@@ -67,7 +71,9 @@ extension ApiProperty {
             estValue: Formatters.formatValueRange(low: value_range_low, high: value_range_high),
             estGrowth: Formatters.formatAmount(growth),
             monthlyRental: Formatters.formatRent(monthly_rent),
-            cardVariant: variant
+            cardVariant: variant,
+            insightText: insightText,
+            actionLabel: actionLabel
         )
     }
 }

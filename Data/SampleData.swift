@@ -55,10 +55,73 @@ enum SamplePortfolioData {
     ]
     private static let defaultBasePrice = 5_000
 
-    // Card variant cycle pattern
-    private static let variantPattern: [PropertyCardVariant] = [
-        .plain, .insight, .addPurchasePrice, .insightAction, .plain,
-    ]
+    // Strip types for dynamic assignment
+    private static let stripTypes: [PropertyCardVariant] = [.insight, .addPurchasePrice, .insightAction]
+
+    /// Deterministic hash for stable variant assignment across app launches.
+    /// (Swift's `hashValue` is randomized per process.)
+    private static func stableHash(_ string: String) -> Int {
+        string.utf8.reduce(0) { ($0 &* 31) &+ Int($1) }
+    }
+
+    /// Returns (variant, insightText, actionLabel) for each property in the list.
+    /// - 1 property: insight strip on it
+    /// - 2 properties: insight + addPurchasePrice
+    /// - 3 properties: one of each strip type
+    /// - >3: pick 3 random cards (stable hash) for strips, rest plain
+    static func assignInsightStrips(
+        for inputs: [PropertyInput]
+    ) -> [(variant: PropertyCardVariant, insightText: String, actionLabel: String)] {
+        let count = inputs.count
+        guard count > 0 else { return [] }
+
+        // For ≤3 properties, assign strips by position
+        if count <= 3 {
+            return inputs.enumerated().map { index, input in
+                let variant: PropertyCardVariant
+                switch count {
+                case 1: variant = .insight
+                case 2: variant = [.insight, .addPurchasePrice][index]
+                default: variant = stripTypes[index]
+                }
+                let text = insightText(for: variant, monthlyRent: input.monthlyRent)
+                let label = variant == .insightAction ? "Post now" : ""
+                return (variant, text, label)
+            }
+        }
+
+        // >3 properties: pick 3 random indices using stable hash, assign one strip type each
+        // Sort indices by their stable hash to get a deterministic "random" pick
+        let scored = inputs.enumerated().map { (index: $0, hash: abs(stableHash($1.projectName))) }
+        let picked = scored.sorted { $0.hash < $1.hash }.prefix(3).map(\.index)
+
+        // Map picked indices → strip types (shuffled by hash order)
+        var stripForIndex: [Int: PropertyCardVariant] = [:]
+        for (i, idx) in picked.enumerated() {
+            stripForIndex[idx] = stripTypes[i]
+        }
+
+        return inputs.enumerated().map { index, input in
+            let variant = stripForIndex[index] ?? .plain
+            let text = insightText(for: variant, monthlyRent: input.monthlyRent)
+            let label = variant == .insightAction ? "Post now" : ""
+            return (variant, text, label)
+        }
+    }
+
+    /// Generates insight text for a given variant and monthly rent.
+    static func insightText(for variant: PropertyCardVariant, monthlyRent: Int) -> String {
+        switch variant {
+        case .insight:
+            return "Similar properties are getting upto ₹\(Int((Double(monthlyRent) * 1.4 / 1000).rounded()))k monthly rent"
+        case .insightAction:
+            return "20+ tenants are looking to rent similar property in the area"
+        case .addPurchasePrice:
+            return ""
+        case .plain:
+            return ""
+        }
+    }
 
     // ─── Computed valuations ──────────────────────────────────────────────────
 
@@ -118,7 +181,8 @@ enum SamplePortfolioData {
         realValuations: [String: CachedValuation]? = nil,
         valuationState: ValuationState = .idle
     ) -> [PortfolioProperty] {
-        valuations(for: inputs, realValuations: realValuations).enumerated().map { i, v in
+        let strips = assignInsightStrips(for: inputs)
+        return valuations(for: inputs, realValuations: realValuations).enumerated().map { i, v in
             let isNew = i < newCount
             let hasRealValuation = realValuations?[v.input.projectName] != nil
             let isPending: Bool
@@ -128,19 +192,9 @@ enum SamplePortfolioData {
             case .succeeded, .failed:
                 isPending = false
             }
-            let variant = isNew ? .plain : {
-                let seedIndex = i - newCount
-                return seedIndex < variantPattern.count ? variantPattern[seedIndex] : .plain
-            }()
-            let insightText: String
-            switch variant {
-            case .insight:
-                insightText = "Similar properties are getting upto ₹\(Int((Double(v.input.monthlyRent) * 1.4 / 1000).rounded()))k monthly rent"
-            case .insightAction:
-                insightText = "20+ tenants are looking to rent similar property in the area"
-            default:
-                insightText = ""
-            }
+            let strip = strips[i]
+            let variant = strip.variant
+            let insightText = strip.insightText
             // Build subtitle: "SocietyName, Locality, City" or "Locality, City"
             let subtitle: String = {
                 var parts: [String] = []
@@ -160,7 +214,7 @@ enum SamplePortfolioData {
                 monthlyRental: Formatters.formatRent(Double(v.input.monthlyRent)),
                 cardVariant: variant,
                 insightText: insightText,
-                actionLabel: variant == .insightAction ? "Post now" : "",
+                actionLabel: strip.actionLabel,
                 isNew: isNew,
                 isValuationPending: isPending,
                 confidence: v.confidence,
