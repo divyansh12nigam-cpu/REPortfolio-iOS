@@ -13,6 +13,7 @@ class PropertyRepository: ObservableObject {
     private static let countKey = "savedAddedCount"
     private static let valuationsKey = "cachedValuations"
     private static let lastRefreshKey = "lastValuationRefresh"
+    private static let userIdKey = "savedUserId"
 
     @Published var propertyInputs: [PropertyInput]
     /// Number of user-added properties (inserted at the front of the list).
@@ -110,11 +111,25 @@ class PropertyRepository: ObservableObject {
     }
 
     /// Download properties from Supabase after sign-in.
+    /// - Detects user switch → clears stale local data first.
     /// - If cloud has data → replaces local.
-    /// - If cloud is empty but local has user-added data → uploads local (migration).
+    /// - If cloud is empty but same user has local data → uploads local (migration).
     @MainActor
     func syncFromCloud() async {
         guard let userId = AuthManager.shared.currentUserId else { return }
+
+        // Detect user switch — clear local data belonging to a different user
+        let storedUserId = UserDefaults.standard.string(forKey: Self.userIdKey)
+        if storedUserId != userId {
+            propertyInputs = []
+            addedCount = 0
+            valuations = [:]
+            lastValuationRefresh = nil
+            save()
+            saveValuations()
+            UserDefaults.standard.set(userId, forKey: Self.userIdKey)
+            print("[CloudSync] User changed (\(storedUserId ?? "none") → \(userId)) — cleared local data")
+        }
 
         do {
             let cloudProperties = try await SupabasePropertyStore.fetchAll()
@@ -133,7 +148,7 @@ class PropertyRepository: ObservableObject {
                 )
                 print("[CloudSync] Migrated \(propertyInputs.count) local properties to cloud")
             } else {
-                print("[CloudSync] No cloud data and no local user data — keeping seed data")
+                print("[CloudSync] No cloud data and no local user data — empty portfolio")
             }
         } catch {
             print("[CloudSync] Sync failed (using local data): \(error.localizedDescription)")
