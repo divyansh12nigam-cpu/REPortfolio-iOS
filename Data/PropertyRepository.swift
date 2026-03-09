@@ -96,8 +96,7 @@ class PropertyRepository: ObservableObject {
     private func syncToCloud() {
         let inputs = propertyInputs  // capture outside Task
         Task { @MainActor in
-            guard let userId = AuthManager.shared.currentUserId,
-                  !AuthManager.shared.isOffline else { return }
+            guard let userId = AuthManager.shared.currentUserId else { return }
 
             do {
                 try await SupabasePropertyStore.replaceAll(
@@ -115,8 +114,7 @@ class PropertyRepository: ObservableObject {
     /// - If cloud is empty but local has user-added data → uploads local (migration).
     @MainActor
     func syncFromCloud() async {
-        guard let userId = AuthManager.shared.currentUserId,
-              !AuthManager.shared.isOffline else { return }
+        guard let userId = AuthManager.shared.currentUserId else { return }
 
         do {
             let cloudProperties = try await SupabasePropertyStore.fetchAll()
@@ -170,8 +168,8 @@ class PropertyRepository: ObservableObject {
             var mergedValuations: [String: CachedValuation] = [:]
             var missedInputs = propertyInputs
 
-            // Step 1: Check Supabase shared cache (skip on force refresh or offline)
-            if !force && !AuthManager.shared.isOffline {
+            // Step 1: Check Supabase shared cache (skip on force refresh)
+            if !force {
                 do {
                     let cacheHits = try await SupabaseValuationCache.batchLookup(inputs: propertyInputs)
                     mergedValuations.merge(cacheHits) { _, new in new }
@@ -212,13 +210,11 @@ class PropertyRepository: ObservableObject {
                 }
 
                 // Step 3: Store fresh results in shared cache (benefits other users)
-                if !AuthManager.shared.isOffline {
-                    Task {
-                        await SupabaseValuationCache.storeResults(
-                            inputs: missedInputs,
-                            valuations: freshValuations
-                        )
-                    }
+                Task {
+                    await SupabaseValuationCache.storeResults(
+                        inputs: missedInputs,
+                        valuations: freshValuations
+                    )
                 }
             }
 

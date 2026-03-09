@@ -35,14 +35,6 @@ targets:
     dependencies:
       - package: Supabase
         product: Supabase
-    # NOTE: Uncomment the entitlements block below when you have a paid
-    # Apple Developer Program membership ($99/year). Sign in with Apple
-    # requires a paid team — free/personal teams don't support it.
-    # entitlements:
-    #   path: REPortfolio-iOS.entitlements
-    #   properties:
-    #     com.apple.developer.applesignin:
-    #       - Default
     settings:
       base:
         PRODUCT_NAME: REPortfolio

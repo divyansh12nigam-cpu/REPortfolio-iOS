@@ -1,5 +1,4 @@
 import SwiftUI
-import AuthenticationServices
 import Supabase
 
 /// Authentication state for the app.
@@ -9,16 +8,14 @@ enum AuthState: Equatable {
     case signedIn(userId: String)
 }
 
-/// Manages Sign in with Apple → Supabase Auth flow.
+/// Manages email/password authentication via Supabase Auth.
 @MainActor
 class AuthManager: ObservableObject {
     static let shared = AuthManager()
 
     @Published var authState: AuthState = .loading
     @Published var errorMessage: String?
-
-    /// True when user chose "Continue without signing in" — skips cloud sync.
-    var isOffline: Bool { currentUserId == "offline" }
+    @Published var isLoading: Bool = false
 
     private var authListener: Task<Void, Never>?
 
@@ -44,64 +41,53 @@ class AuthManager: ObservableObject {
         }
     }
 
-    // MARK: - Sign in with Apple (via SignInWithAppleButton result)
+    // MARK: - Email/Password Auth
 
-    /// Handle the result from SwiftUI's `SignInWithAppleButton` completion.
-    func handleAppleSignIn(result: Result<ASAuthorization, Error>) async {
+    /// Create a new account with email and password.
+    func signUp(email: String, password: String) async {
         errorMessage = nil
+        isLoading = true
+        defer { isLoading = false }
 
-        switch result {
-        case .success(let authorization):
-            guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                errorMessage = "Unexpected credential type."
-                return
-            }
-            guard let identityToken = credential.identityToken,
-                  let tokenString = String(data: identityToken, encoding: .utf8) else {
-                errorMessage = "Failed to get Apple identity token."
-                return
-            }
-
-            do {
-                let session = try await SupabaseManager.client.auth.signInWithIdToken(
-                    credentials: .init(
-                        provider: .apple,
-                        idToken: tokenString
-                    )
-                )
-                authState = .signedIn(userId: session.user.id.uuidString)
-                print("[Auth] Signed in: \(session.user.id)")
-            } catch {
-                print("[Auth] Supabase sign in failed: \(error)")
-                errorMessage = "Sign in failed. Please try again."
-            }
-
-        case .failure(let error):
-            if let asError = error as? ASAuthorizationError, asError.code == .canceled {
-                print("[Auth] User canceled Sign in with Apple")
-                return
-            }
-            print("[Auth] Apple sign in failed: \(error)")
-            errorMessage = "Sign in failed. Please try again."
+        do {
+            let result = try await SupabaseManager.client.auth.signUp(
+                email: email,
+                password: password
+            )
+            authState = .signedIn(userId: result.user.id.uuidString)
+            print("[Auth] Signed up: \(result.user.id)")
+        } catch {
+            print("[Auth] Sign up failed: \(error)")
+            errorMessage = parseAuthError(error)
         }
     }
 
-    // MARK: - Offline mode
+    /// Sign in with existing email and password.
+    func signIn(email: String, password: String) async {
+        errorMessage = nil
+        isLoading = true
+        defer { isLoading = false }
 
-    /// Skip sign-in and continue with local-only data.
-    func continueOffline() {
-        authState = .signedIn(userId: "offline")
+        do {
+            let session = try await SupabaseManager.client.auth.signIn(
+                email: email,
+                password: password
+            )
+            authState = .signedIn(userId: session.user.id.uuidString)
+            print("[Auth] Signed in: \(session.user.id)")
+        } catch {
+            print("[Auth] Sign in failed: \(error)")
+            errorMessage = parseAuthError(error)
+        }
     }
 
     // MARK: - Sign out
 
     func signOut() async {
-        if !isOffline {
-            do {
-                try await SupabaseManager.client.auth.signOut()
-            } catch {
-                print("[Auth] Sign out error: \(error)")
-            }
+        do {
+            try await SupabaseManager.client.auth.signOut()
+        } catch {
+            print("[Auth] Sign out error: \(error)")
         }
         authState = .signedOut
     }
@@ -131,5 +117,19 @@ class AuthManager: ObservableObject {
                 }
             }
         }
+    }
+
+    private func parseAuthError(_ error: Error) -> String {
+        let message = error.localizedDescription.lowercased()
+        if message.contains("invalid login") || message.contains("invalid_credentials") {
+            return "Incorrect email or password."
+        } else if message.contains("already registered") || message.contains("already been registered") {
+            return "This email is already registered. Try signing in."
+        } else if message.contains("password") && message.contains("short") {
+            return "Password must be at least 6 characters."
+        } else if message.contains("invalid email") || message.contains("not a valid") {
+            return "Please enter a valid email address."
+        }
+        return "Something went wrong. Please try again."
     }
 }

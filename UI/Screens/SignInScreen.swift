@@ -1,8 +1,11 @@
 import SwiftUI
-import AuthenticationServices
 
 struct SignInScreen: View {
     @StateObject private var authManager = AuthManager.shared
+
+    @State private var email = ""
+    @State private var password = ""
+    @State private var isSignUp = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +26,34 @@ struct SignInScreen: View {
                     .foregroundColor(.textSecondary)
             }
 
-            Spacer()
+            Spacer().frame(height: Spacing.widgetsM)
+
+            // Form fields
+            VStack(spacing: Spacing.xl) {
+                TextField("Email", text: $email)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .padding(Spacing.xxl)
+                    .background(Color.surfaceLowContrast)
+                    .cornerRadius(Radius.sm)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Radius.sm)
+                            .stroke(Color.borderSubtle, lineWidth: 1)
+                    )
+
+                SecureField("Password", text: $password)
+                    .textContentType(isSignUp ? .newPassword : .password)
+                    .padding(Spacing.xxl)
+                    .background(Color.surfaceLowContrast)
+                    .cornerRadius(Radius.sm)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Radius.sm)
+                            .stroke(Color.borderSubtle, lineWidth: 1)
+                    )
+            }
+            .padding(.horizontal, Spacing.xxxl)
 
             // Error message
             if let error = authManager.errorMessage {
@@ -32,35 +62,62 @@ struct SignInScreen: View {
                     .foregroundColor(.red)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, Spacing.xxxl)
-                    .padding(.bottom, Spacing.xxl)
+                    .padding(.top, Spacing.xl)
             }
-
-            // Sign in with Apple button
-            SignInWithAppleButton(.signIn) { request in
-                request.requestedScopes = [.fullName, .email]
-            } onCompletion: { result in
-                Task { await authManager.handleAppleSignIn(result: result) }
-            }
-            .signInWithAppleButtonStyle(.black)
-            .frame(height: 50)
-            .cornerRadius(Radius.sm)
-            .padding(.horizontal, Spacing.xxxl)
 
             Spacer().frame(height: Spacing.xxxxl)
 
-            // Skip for now
+            // Primary action button
             Button(action: {
-                authManager.continueOffline()
+                Task {
+                    if isSignUp {
+                        await authManager.signUp(email: email, password: password)
+                    } else {
+                        await authManager.signIn(email: email, password: password)
+                    }
+                }
             }) {
-                Text("Continue without signing in")
+                Group {
+                    if authManager.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text(isSignUp ? "Create Account" : "Sign In")
+                            .font(Typography.bodyLarge)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .foregroundColor(.white)
+                .background(isFormValid ? Color.brandPrimary : Color.brandPrimary.opacity(0.4))
+                .cornerRadius(Radius.sm)
+            }
+            .disabled(!isFormValid || authManager.isLoading)
+            .padding(.horizontal, Spacing.xxxl)
+
+            Spacer().frame(height: Spacing.xxl)
+
+            // Toggle sign in / sign up
+            Button(action: {
+                isSignUp.toggle()
+                authManager.errorMessage = nil
+            }) {
+                Text(isSignUp
+                     ? "Already have an account? **Sign in**"
+                     : "Don't have an account? **Create one**")
                     .font(Typography.bodySmall)
                     .foregroundColor(.textSecondary)
-                    .underline()
             }
-            .padding(.bottom, Spacing.widgetsM)
+
+            Spacer().frame(height: Spacing.xxxxl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.surfaceWhite)
+    }
+
+    private var isFormValid: Bool {
+        !email.trimmingCharacters(in: .whitespaces).isEmpty &&
+        password.count >= 6
     }
 }
 
