@@ -82,12 +82,12 @@ struct SwipeableCardView<Content: View>: View {
                         }
                         .foregroundColor(.surfaceWhite)
                         .frame(width: actionWidth)
-                        .frame(height: cardHeight > 0 ? cardHeight : nil)
+                        .frame(maxHeight: .infinity)
                         .background(Color.successGreen)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.sm))
                     }
                     Spacer()
                 }
+                .clipShape(RoundedRectangle(cornerRadius: Radius.card))
             }
 
             // Card content on top
