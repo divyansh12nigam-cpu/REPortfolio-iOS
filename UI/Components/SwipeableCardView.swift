@@ -9,6 +9,7 @@ struct SwipeableCardView<Content: View>: View {
 
     @State private var offset: CGFloat = 0
     @State private var openSide: OpenSide = .none
+    @State private var dragDirection: DragDirection = .undecided
 
     private let actionWidth: CGFloat = 80
     private var trailingRevealWidth: CGFloat { actionWidth * 2 }  // Edit + Delete
@@ -17,6 +18,10 @@ struct SwipeableCardView<Content: View>: View {
 
     private enum OpenSide {
         case none, leading, trailing
+    }
+
+    private enum DragDirection {
+        case undecided, horizontal, vertical
     }
 
     var body: some View {
@@ -89,14 +94,25 @@ struct SwipeableCardView<Content: View>: View {
                 .gesture(
                     DragGesture(minimumDistance: 20)
                         .onChanged { value in
+                            // Lock direction on first significant movement
+                            if dragDirection == .undecided {
+                                let absH = abs(value.translation.width)
+                                let absV = abs(value.translation.height)
+                                if absH > absV {
+                                    dragDirection = .horizontal
+                                } else {
+                                    dragDirection = .vertical
+                                }
+                            }
+                            // If vertical, do nothing — let ScrollView handle it
+                            guard dragDirection == .horizontal else { return }
+
                             let translation = value.translation.width
                             switch openSide {
                             case .none:
                                 if translation > 0 && onRefresh != nil {
-                                    // Swiping right — cap at leading reveal width
                                     offset = min(leadingRevealWidth, translation)
                                 } else {
-                                    // Swiping left — cap at trailing reveal width
                                     offset = max(-trailingRevealWidth, min(0, translation))
                                 }
                             case .trailing:
@@ -108,18 +124,19 @@ struct SwipeableCardView<Content: View>: View {
                             }
                         }
                         .onEnded { value in
+                            defer { dragDirection = .undecided }
+                            guard dragDirection == .horizontal else { return }
+
                             let translation = value.translation.width
                             switch openSide {
                             case .none:
                                 if translation > 0 && onRefresh != nil {
-                                    // Swiping right
                                     if translation > leadingRevealWidth * snapThreshold {
                                         openLeading()
                                     } else {
                                         close()
                                     }
                                 } else {
-                                    // Swiping left
                                     if -translation > trailingRevealWidth * snapThreshold {
                                         openTrailing()
                                     } else {
