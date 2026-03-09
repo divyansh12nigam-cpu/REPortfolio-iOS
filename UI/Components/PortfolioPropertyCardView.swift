@@ -103,6 +103,13 @@ struct PropertyCardBodyView: View {
 
     // Parse "₹ 1.4 - 1.7Cr" → main + optional Cr suffix
     private var estValueText: some View {
+        if property.isValuationPending {
+            return AnyView(
+                Text("Calculating...")
+                    .font(Typography.bodySmall)
+                    .foregroundColor(.textSecondary)
+            )
+        }
         let raw = property.estValue
         let crRange = raw.range(of: "Cr")
         if let range = crRange {

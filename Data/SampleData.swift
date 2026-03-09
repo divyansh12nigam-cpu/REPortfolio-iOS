@@ -115,10 +115,19 @@ enum SamplePortfolioData {
     static func properties(
         for inputs: [PropertyInput],
         newCount: Int = 0,
-        realValuations: [String: CachedValuation]? = nil
+        realValuations: [String: CachedValuation]? = nil,
+        valuationState: ValuationState = .idle
     ) -> [PortfolioProperty] {
         valuations(for: inputs, realValuations: realValuations).enumerated().map { i, v in
             let isNew = i < newCount
+            let hasRealValuation = realValuations?[v.input.projectName] != nil
+            let isPending: Bool
+            switch valuationState {
+            case .idle, .loading:
+                isPending = isNew && !hasRealValuation
+            case .succeeded, .failed:
+                isPending = false
+            }
             let variant = isNew ? .plain : {
                 let seedIndex = i - newCount
                 return seedIndex < variantPattern.count ? variantPattern[seedIndex] : .plain
@@ -146,13 +155,14 @@ enum SamplePortfolioData {
                 title: v.input.projectName,
                 subtitle: subtitle,
                 status: v.input.monthlyRent > 0 ? "On Rent" : "Self Use",
-                estValue: Formatters.formatValueRange(low: v.lowValue, high: v.highValue),
-                estGrowth: Formatters.formatAmount(v.growth),
+                estValue: isPending ? "Calculating..." : Formatters.formatValueRange(low: v.lowValue, high: v.highValue),
+                estGrowth: isPending ? "—" : Formatters.formatAmount(v.growth),
                 monthlyRental: Formatters.formatRent(Double(v.input.monthlyRent)),
                 cardVariant: variant,
                 insightText: insightText,
                 actionLabel: variant == .insightAction ? "Post now" : "",
                 isNew: isNew,
+                isValuationPending: isPending,
                 confidence: v.confidence,
                 valuationSource: v.valuationSource
             )

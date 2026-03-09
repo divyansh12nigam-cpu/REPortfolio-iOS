@@ -33,6 +33,7 @@ struct PortfolioProperty: Identifiable {
     let insightText: String
     let actionLabel: String
     let isNew: Bool
+    let isValuationPending: Bool
     /// Valuation confidence level — "high", "medium", "low", or nil if no valuation.
     let confidence: String?
     /// Valuation source — "parsed", "project_page", "fallback", "failed", or nil.
@@ -50,6 +51,7 @@ struct PortfolioProperty: Identifiable {
         insightText: String = "",
         actionLabel: String = "",
         isNew: Bool = false,
+        isValuationPending: Bool = false,
         confidence: String? = nil,
         valuationSource: String? = nil
     ) {
@@ -64,6 +66,7 @@ struct PortfolioProperty: Identifiable {
         self.insightText = insightText
         self.actionLabel = actionLabel
         self.isNew = isNew
+        self.isValuationPending = isValuationPending
         self.confidence = confidence
         self.valuationSource = valuationSource
     }

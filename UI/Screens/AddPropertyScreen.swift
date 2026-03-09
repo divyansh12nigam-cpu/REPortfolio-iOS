@@ -67,6 +67,7 @@ struct AddPropertyScreen: View {
                                 onComplete()
                             } else {
                                 repository.addProperty(input)
+                                repository.valuationState = .loading(startedAt: Date())
                                 showSuccess = true
                             }
                         }
@@ -217,6 +218,10 @@ private struct SuccessView: View {
         .background(phase == .success ? Color.successScreenBg : Color.surfaceWhite)
         .animation(.easeInOut(duration: 0.5), value: phase)
         .task {
+            // Fire valuation refresh in unstructured task — survives SuccessView dismissal.
+            // force: true bypasses staleness check so the new property gets valuated.
+            Task { await PropertyRepository.shared.refreshValuations(force: true) }
+
             progress = 0.5
             try? await Task.sleep(nanoseconds: 2_000_000_000)
             phase = .generating

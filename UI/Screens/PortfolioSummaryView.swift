@@ -33,7 +33,8 @@ struct PortfolioSummaryView: View {
         apiProperties ?? SamplePortfolioData.properties(
             for: repository.propertyInputs,
             newCount: repository.addedCount,
-            realValuations: realValuations
+            realValuations: realValuations,
+            valuationState: repository.valuationState
         )
     }
 
@@ -138,6 +139,17 @@ struct PortfolioSummaryView: View {
             }
         }
         .task(id: "valuation-\(repository.propertyInputs.count)") {
+            // Skip if SuccessView already kicked off a refresh that's still running
+            guard !repository.isRefreshingValuations else {
+                print("[ValuationRefresh] Already in progress — skipping")
+                return
+            }
+            // Skip if a refresh just completed (SuccessView's refresh finished during animation)
+            if case .succeeded(let at) = repository.valuationState,
+               Date().timeIntervalSince(at) < 30 {
+                print("[ValuationRefresh] Just completed \(Int(Date().timeIntervalSince(at)))s ago — skipping")
+                return
+            }
             // Wake the server first to reduce cold-start latency
             await repository.wakeServer()
             // Then refresh valuations
