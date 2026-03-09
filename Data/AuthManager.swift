@@ -99,6 +99,11 @@ class AuthManager: ObservableObject {
         return nil
     }
 
+    /// The signed-in user's email, read from the current Supabase session.
+    var currentUserEmail: String? {
+        try? SupabaseManager.client.auth.currentSession?.user.email
+    }
+
     // MARK: - Private
 
     private func listenForAuthChanges() {

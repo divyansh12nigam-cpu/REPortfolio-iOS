@@ -6,6 +6,7 @@ struct PortfolioSummaryView: View {
     var onEditProperty: (Int) -> Void = { _ in }
     /// Triggered by the "Add Purchase Price" strip — opens edit flow at Step 2, purchase price focused.
     var onAddPurchasePrice: (Int) -> Void = { _ in }
+    var onProfileTap: () -> Void = {}
 
     @Environment(\.openURL) private var openURL
 
@@ -43,7 +44,7 @@ struct PortfolioSummaryView: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     // Page header
-                    PortfolioPageHeaderView()
+                    PortfolioPageHeaderView(isRootScreen: true, onBack: onProfileTap)
 
                     // Valuation status banner
                     valuationBanner

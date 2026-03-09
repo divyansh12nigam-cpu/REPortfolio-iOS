@@ -3,18 +3,20 @@ import SwiftUI
 struct PortfolioPageHeaderView: View {
     var title: String = "My Portfolio"
     var showRightButton: Bool = true
+    /// When true (root/portfolio screen), shows a profile icon instead of back arrow.
+    var isRootScreen: Bool = false
     var onBack: () -> Void = {}
 
     var body: some View {
         HStack {
-            // Back button — circular border
+            // Left button — profile icon on root, back arrow on sub-screens
             Button(action: onBack) {
-                Image(systemName: "arrow.left")
-                    .font(.system(size: 16, weight: .medium))
+                Image(systemName: isRootScreen ? "person.crop.circle" : "arrow.left")
+                    .font(.system(size: isRootScreen ? 22 : 16, weight: .medium))
                     .foregroundColor(.textPrimary)
                     .frame(width: 36, height: 36)
                     .overlay(
-                        Circle().stroke(Color.borderSubtle, lineWidth: 1)
+                        Circle().stroke(Color.borderSubtle, lineWidth: isRootScreen ? 0 : 1)
                     )
             }
 

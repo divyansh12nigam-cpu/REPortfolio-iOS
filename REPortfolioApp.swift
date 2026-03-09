@@ -36,6 +36,7 @@ struct REPortfolioApp: App {
 
 enum AppScreen: Equatable {
     case portfolio
+    case profile
     case propertyDetail(index: Int)
     case addProperty
     case editProperty(index: Int)
@@ -54,8 +55,15 @@ struct RootNavigationView: View {
                 onPropertyTap: { index in activeScreen = .propertyDetail(index: index) },
                 onAddClick: { activeScreen = .addProperty },
                 onEditProperty: { index in activeScreen = .editProperty(index: index) },
-                onAddPurchasePrice: { index in activeScreen = .editPropertyPurchasePrice(index: index) }
+                onAddPurchasePrice: { index in activeScreen = .editPropertyPurchasePrice(index: index) },
+                onProfileTap: { activeScreen = .profile }
             )
+
+            if activeScreen == .profile {
+                ProfileScreen(onBack: { activeScreen = .portfolio })
+                    .swipeBack(onBack: { activeScreen = .portfolio })
+                    .transition(.move(edge: .leading))
+            }
 
             if case .propertyDetail(let index) = activeScreen {
                 PropertyDetailView(
