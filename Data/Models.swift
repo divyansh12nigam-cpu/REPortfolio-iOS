@@ -33,6 +33,10 @@ struct PortfolioProperty: Identifiable {
     let insightText: String
     let actionLabel: String
     let isNew: Bool
+    /// Valuation confidence level — "high", "medium", "low", or nil if no valuation.
+    let confidence: String?
+    /// Valuation source — "parsed", "project_page", "fallback", "failed", or nil.
+    let valuationSource: String?
 
     init(
         id: String,
@@ -45,7 +49,9 @@ struct PortfolioProperty: Identifiable {
         cardVariant: PropertyCardVariant,
         insightText: String = "",
         actionLabel: String = "",
-        isNew: Bool = false
+        isNew: Bool = false,
+        confidence: String? = nil,
+        valuationSource: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -58,6 +64,13 @@ struct PortfolioProperty: Identifiable {
         self.insightText = insightText
         self.actionLabel = actionLabel
         self.isNew = isNew
+        self.confidence = confidence
+        self.valuationSource = valuationSource
+    }
+
+    /// True when the valuation is a low-confidence city-average fallback.
+    var isFallbackValuation: Bool {
+        valuationSource == "fallback" && confidence == "low"
     }
 }
 
@@ -92,6 +105,31 @@ struct OnboardingFormState {
     var customName: String = ""
 }
 
+// ─── Valuation State & Error ─────────────────────────────────────────────────
+
+enum ValuationState: Equatable {
+    case idle
+    case loading(startedAt: Date)
+    case succeeded(at: Date)
+    case failed(error: ValuationError, at: Date)
+}
+
+enum ValuationError: Error, Equatable {
+    case networkError(String)
+    case timeout
+    case serverError(Int)
+    case decodingError(String)
+
+    var userMessage: String {
+        switch self {
+        case .networkError: return "Couldn't connect to valuation server."
+        case .timeout: return "Valuation request timed out."
+        case .serverError(let code): return "Server error (\(code))."
+        case .decodingError: return "Unexpected response from server."
+        }
+    }
+}
+
 // ─── Cached Valuation (from 99acres valuation service) ───────────────────────
 
 struct CachedValuation: Codable {
@@ -104,6 +142,10 @@ struct CachedValuation: Codable {
     let source: String
     let confidence: String
     let comparableCount: Int
+    let bhkFiltered: Bool
+    let sizeFiltered: Bool
+    let filterFallback: String
+    let warnings: [String]
     let fetchedAt: Date
 }
 
@@ -144,6 +186,10 @@ struct ApiValuation: Decodable {
     let searchTier: String
     let confidence: String
     let comparableCount: Int
+    let bhkFiltered: Bool?
+    let sizeFiltered: Bool?
+    let filterFallback: String?
+    let warnings: [String]?
     let cachedAt: String
 }
 

@@ -68,6 +68,8 @@ enum SamplePortfolioData {
         let lowValue: Double
         let highValue: Double
         let growth: Double
+        let confidence: String?
+        let valuationSource: String?
     }
 
     /// Compute valuations for each property.
@@ -85,7 +87,9 @@ enum SamplePortfolioData {
                     fairValue: real.fairValue,
                     lowValue: real.valueLow,
                     highValue: real.valueHigh,
-                    growth: real.growth
+                    growth: real.growth,
+                    confidence: real.confidence,
+                    valuationSource: real.source
                 )
             }
             // Fallback: hardcoded city base price
@@ -100,7 +104,7 @@ enum SamplePortfolioData {
             let low   = fair * 0.95
             let high  = fair * 1.05
             let growth = high - Double(p.purchasePrice)
-            return Valuation(input: p, fairValue: fair, lowValue: low, highValue: high, growth: growth)
+            return Valuation(input: p, fairValue: fair, lowValue: low, highValue: high, growth: growth, confidence: nil, valuationSource: nil)
         }
     }
 
@@ -148,7 +152,9 @@ enum SamplePortfolioData {
                 cardVariant: variant,
                 insightText: insightText,
                 actionLabel: variant == .insightAction ? "Post now" : "",
-                isNew: isNew
+                isNew: isNew,
+                confidence: v.confidence,
+                valuationSource: v.valuationSource
             )
         }
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PortfolioSummaryHeroView: View {
     let summary: PortfolioSummary
+    var lastUpdated: Date? = nil
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,6 +23,14 @@ struct PortfolioSummaryHeroView: View {
                         .padding(.bottom, Spacing.s)
 
                     netWorthText
+                }
+
+                // "Updated X days ago"
+                if let date = lastUpdated {
+                    Text(updatedAgoText(from: date))
+                        .font(Typography.captionMed)
+                        .foregroundColor(.textSecondary)
+                        .padding(.top, Spacing.s)
                 }
 
                 Spacer().frame(height: Spacing.xxxl)
@@ -55,6 +64,13 @@ struct PortfolioSummaryHeroView: View {
                 endPoint: .bottom
             )
         )
+    }
+
+    private func updatedAgoText(from date: Date) -> String {
+        let days = Int(Date().timeIntervalSince(date) / 86400)
+        if days == 0 { return "Updated today" }
+        if days == 1 { return "Updated yesterday" }
+        return "Updated \(days) days ago"
     }
 
     // Parse "₹2.15 Cr" → main part + optional suffix with mixed font sizes

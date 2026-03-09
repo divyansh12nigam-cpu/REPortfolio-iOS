@@ -44,8 +44,14 @@ struct PortfolioSummaryView: View {
                     // Page header
                     PortfolioPageHeaderView()
 
+                    // Valuation status banner
+                    valuationBanner
+
                     // Hero section
-                    PortfolioSummaryHeroView(summary: summary)
+                    PortfolioSummaryHeroView(
+                        summary: summary,
+                        lastUpdated: repository.oldestValuationDate
+                    )
 
                     // "YOUR PROPERTIES (N)" + "+ Add" row
                     propertiesSectionHeader
@@ -92,6 +98,10 @@ struct PortfolioSummaryView: View {
                     DisclaimerFooterView()
                 }
             }
+            .refreshable {
+                await repository.wakeServer()
+                await repository.refreshValuations(force: true)
+            }
             .background(Color.surfaceWhite)
 
             StatusBarFadeOverlay()
@@ -104,7 +114,6 @@ struct PortfolioSummaryView: View {
             Button("Delete", role: .destructive) {
                 if let index = propertyToDeleteIndex {
                     withAnimation { repository.removeProperty(at: index) }
-                    // Clear API cache so local computation picks up immediately
                     apiSummary = nil
                     apiProperties = nil
                 }
@@ -124,15 +133,73 @@ struct PortfolioSummaryView: View {
                     }
                 }
             } catch {
-                // Clear API state so computed properties use local data
                 apiSummary = nil
                 apiProperties = nil
             }
         }
         .task(id: "valuation-\(repository.propertyInputs.count)") {
-            // Always refresh on launch — service caches internally, so this is cheap for repeat calls
-            print("[ValuationRefresh] Triggering refresh for \(repository.propertyInputs.count) properties")
+            // Wake the server first to reduce cold-start latency
+            await repository.wakeServer()
+            // Then refresh valuations
             await repository.refreshValuations()
+        }
+    }
+
+    // ─── Valuation status banner ─────────────────────────────────────────────
+
+    @ViewBuilder
+    private var valuationBanner: some View {
+        switch repository.valuationState {
+        case .loading(let startedAt):
+            let elapsed = Date().timeIntervalSince(startedAt)
+            HStack(spacing: Spacing.l) {
+                ProgressView()
+                    .scaleEffect(0.8)
+                Text(elapsed > 10 ? "This may take a moment (waking up server)..." : "Updating valuations...")
+                    .font(Typography.bodySmall)
+                    .foregroundColor(.textSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Spacing.l)
+            .background(Color.insightBaseUltralight)
+
+        case .failed(let error, _):
+            HStack(spacing: Spacing.l) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.orange)
+                    .font(.system(size: 14))
+                Text(error.userMessage + " Showing cached values.")
+                    .font(Typography.bodySmall)
+                    .foregroundColor(.textSecondary)
+                Spacer()
+                Button("Retry") {
+                    Task {
+                        await repository.wakeServer()
+                        await repository.refreshValuations(force: true)
+                    }
+                }
+                .font(Typography.bodySmall)
+                .foregroundColor(.brandPrimary)
+            }
+            .padding(.horizontal, Spacing.xxl)
+            .padding(.vertical, Spacing.l)
+            .background(Color(red: 1, green: 0.97, blue: 0.93))
+
+        default:
+            if repository.isValuationOutdated {
+                HStack(spacing: Spacing.l) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .foregroundColor(.orange)
+                        .font(.system(size: 14))
+                    Text("Valuations may be outdated. Pull down to refresh.")
+                        .font(Typography.bodySmall)
+                        .foregroundColor(.textSecondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Spacing.xxl)
+                .padding(.vertical, Spacing.l)
+                .background(Color(red: 1, green: 0.97, blue: 0.93))
+            }
         }
     }
 

@@ -37,23 +37,47 @@ enum PortfolioApi {
 enum ValuationApi {
     private static let baseURL = URL(string: "https://valuation-service-m8m9.onrender.com")!
 
-    /// Dedicated session with longer timeout — scraping can take 60-90s, plus Render cold starts (~50s).
+    /// Dedicated session with 120s timeout (reduced from 240s — /wake warms the server separately).
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 240
-        config.timeoutIntervalForResource = 300
+        config.timeoutIntervalForRequest = 120
+        config.timeoutIntervalForResource = 150
         return URLSession(configuration: config)
     }()
 
+    /// GET /wake — Warm up the Render server to avoid cold start delays on the batch request.
+    static func wake() async {
+        let url = baseURL.appendingPathComponent("wake")
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 30
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse {
+                print("[ValuationApi] Wake response: \(http.statusCode)")
+            }
+        } catch {
+            print("[ValuationApi] Wake failed (non-fatal): \(error.localizedDescription)")
+        }
+    }
+
     /// POST /valuate-batch
+    /// - Parameter forceRefresh: If true, skips server-side cache (appends ?forceRefresh=true)
     static func fetchBatchValuation(
-        inputs: [PropertyInput]
+        inputs: [PropertyInput],
+        forceRefresh: Bool = false
     ) async throws -> ValuationBatchResponse {
-        let url = baseURL.appendingPathComponent("valuate-batch")
+        var urlComponents = URLComponents(url: baseURL.appendingPathComponent("valuate-batch"), resolvingAgainstBaseURL: false)!
+        if forceRefresh {
+            urlComponents.queryItems = [URLQueryItem(name: "forceRefresh", value: "true")]
+        }
+        guard let url = urlComponents.url else {
+            throw ValuationError.networkError("Invalid URL")
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 240
+        request.timeoutInterval = 120
 
         let body = ValuationBatchRequest(
             properties: inputs.map { p in
@@ -73,17 +97,32 @@ enum ValuationApi {
 
         print("[ValuationApi] POST \(url.absoluteString) with \(inputs.count) properties")
 
-        let (data, response) = try await session.data(for: request)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch let urlError as URLError where urlError.code == .timedOut {
+            throw ValuationError.timeout
+        } catch let urlError as URLError {
+            throw ValuationError.networkError(urlError.localizedDescription)
+        }
 
         if let httpResponse = response as? HTTPURLResponse {
             print("[ValuationApi] Response status: \(httpResponse.statusCode), body size: \(data.count) bytes")
+            if httpResponse.statusCode >= 500 {
+                throw ValuationError.serverError(httpResponse.statusCode)
+            }
         }
 
-        let decoded = try JSONDecoder().decode(ValuationBatchResponse.self, from: data)
-        print("[ValuationApi] Decoded \(decoded.valuations.count) valuations")
-        for v in decoded.valuations {
-            print("[ValuationApi]   \(v.projectName): ₹\(Int(v.fairValue)) (source: \(v.source))")
+        do {
+            let decoded = try JSONDecoder().decode(ValuationBatchResponse.self, from: data)
+            print("[ValuationApi] Decoded \(decoded.valuations.count) valuations")
+            for v in decoded.valuations {
+                print("[ValuationApi]   \(v.projectName): ₹\(Int(v.fairValue)) (source: \(v.source), confidence: \(v.confidence))")
+            }
+            return decoded
+        } catch {
+            throw ValuationError.decodingError(error.localizedDescription)
         }
-        return decoded
     }
 }

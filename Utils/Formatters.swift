@@ -17,13 +17,23 @@ enum Formatters {
     }
 
     /// Format a low–high value range as "₹ X - YCr" or "₹ X - YL"
+    /// When low and high round to the same display value, show a single number.
     static func formatValueRange(low: Double, high: Double) -> String {
         if high >= 10_000_000 {
-            return String(format: "₹ %.1f - %.1fCr", low / 10_000_000, high / 10_000_000)
+            let lo = String(format: "%.1f", low / 10_000_000)
+            let hi = String(format: "%.1f", high / 10_000_000)
+            if lo == hi { return "₹ \(hi)Cr" }
+            return "₹ \(lo) - \(hi)Cr"
         } else if high >= 100_000 {
-            return String(format: "₹ %.0f - %.0fL", low / 100_000, high / 100_000)
+            let lo = String(format: "%.0f", low / 100_000)
+            let hi = String(format: "%.0f", high / 100_000)
+            if lo == hi { return "₹ \(hi)L" }
+            return "₹ \(lo) - \(hi)L"
         } else {
-            return String(format: "₹ %.0f - %.0f", low, high)
+            let lo = String(format: "%.0f", low)
+            let hi = String(format: "%.0f", high)
+            if lo == hi { return "₹ \(hi)" }
+            return "₹ \(lo) - \(hi)"
         }
     }
 
