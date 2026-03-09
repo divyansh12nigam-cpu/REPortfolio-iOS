@@ -30,7 +30,7 @@ struct SignInScreen: View {
 
             // Form fields
             VStack(spacing: Spacing.xl) {
-                TextField("Email", text: $email)
+                TextField("", text: $email, prompt: Text("Email").foregroundColor(.textSecondary))
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
@@ -43,7 +43,7 @@ struct SignInScreen: View {
                             .stroke(Color.borderSubtle, lineWidth: 1)
                     )
 
-                SecureField("Password", text: $password)
+                SecureField("", text: $password, prompt: Text("Password").foregroundColor(.textSecondary))
                     .textContentType(isSignUp ? .newPassword : .password)
                     .padding(Spacing.xxl)
                     .background(Color.surfaceLowContrast)

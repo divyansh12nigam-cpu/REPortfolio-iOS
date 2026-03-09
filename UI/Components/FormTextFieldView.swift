@@ -24,7 +24,7 @@ struct FormTextFieldView: View {
                         .font(Typography.bodyMedium)
                         .foregroundColor(.textSecondary)
                 }
-                TextField(placeholder, text: $value)
+                TextField("", text: $value, prompt: Text(placeholder).foregroundColor(.textSecondary))
                     .font(Typography.bodyMedium)
                     .foregroundColor(.textPrimary)
                     .keyboardType(keyboardType)

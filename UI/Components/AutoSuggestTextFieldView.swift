@@ -28,7 +28,7 @@ struct AutoSuggestTextFieldView: View {
                 .font(Typography.bodyMedium)
                 .foregroundColor(.textPrimary)
 
-            TextField(placeholder, text: $value)
+            TextField("", text: $value, prompt: Text(placeholder).foregroundColor(.textSecondary))
                 .font(Typography.bodyMedium)
                 .foregroundColor(.textPrimary)
                 .focused($isFocused)
