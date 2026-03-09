@@ -218,9 +218,9 @@ private struct SuccessView: View {
         .background(phase == .success ? Color.successScreenBg : Color.surfaceWhite)
         .animation(.easeInOut(duration: 0.5), value: phase)
         .task {
-            // Fire valuation refresh in unstructured task — survives SuccessView dismissal.
-            // force: true bypasses staleness check so the new property gets valuated.
-            Task { await PropertyRepository.shared.refreshValuations(force: true) }
+            // Refresh only the newly added property (not all) to save API calls.
+            let newInput = buildPropertyInput(formState)
+            Task { await PropertyRepository.shared.refreshSingleValuation(for: newInput) }
 
             progress = 0.5
             try? await Task.sleep(nanoseconds: 2_000_000_000)

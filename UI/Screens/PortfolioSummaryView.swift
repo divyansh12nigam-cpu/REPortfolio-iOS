@@ -67,7 +67,16 @@ struct PortfolioSummaryView: View {
                             VStack(spacing: property.cardVariant == .plain ? 0 : -Spacing.xxl) {
                                 SwipeableCardView(
                                     onEdit: { onEditProperty(index) },
-                                    onDelete: { propertyToDeleteIndex = index }
+                                    onDelete: { propertyToDeleteIndex = index },
+                                    onRefresh: {
+                                        guard index < repository.propertyInputs.count else { return }
+                                        Task {
+                                            await repository.wakeServer()
+                                            await repository.refreshSingleValuation(
+                                                for: repository.propertyInputs[index]
+                                            )
+                                        }
+                                    }
                                 ) {
                                     PropertyCardBodyView(
                                         property: property,

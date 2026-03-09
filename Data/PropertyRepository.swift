@@ -167,7 +167,7 @@ class PropertyRepository: ObservableObject {
     /// 1. Check Supabase shared cache for hits
     /// 2. Scrape only cache misses via Render valuation service
     /// 3. Store fresh results in shared cache (benefits other users)
-    /// - Parameter force: If true, skips local staleness check and server-side cache.
+    /// - Parameter force: If true, skips local 7-day staleness check (but still uses Supabase + server caches).
     @MainActor
     func refreshValuations(force: Bool = false) async {
         // Skip if not stale (unless force refresh)
@@ -183,24 +183,22 @@ class PropertyRepository: ObservableObject {
             var mergedValuations: [String: CachedValuation] = [:]
             var missedInputs = propertyInputs
 
-            // Step 1: Check Supabase shared cache (skip on force refresh)
-            if !force {
-                do {
-                    let cacheHits = try await SupabaseValuationCache.batchLookup(inputs: propertyInputs)
-                    mergedValuations.merge(cacheHits) { _, new in new }
-                    missedInputs = SupabaseValuationCache.cacheMisses(inputs: propertyInputs, hits: cacheHits)
-                    print("[ValuationRefresh] Cache hits: \(cacheHits.count), misses: \(missedInputs.count)")
-                } catch {
-                    print("[ValuationRefresh] Cache lookup failed (will scrape all): \(error.localizedDescription)")
-                    missedInputs = propertyInputs
-                }
+            // Step 1: Always check Supabase shared cache (even on force refresh)
+            do {
+                let cacheHits = try await SupabaseValuationCache.batchLookup(inputs: propertyInputs)
+                mergedValuations.merge(cacheHits) { _, new in new }
+                missedInputs = SupabaseValuationCache.cacheMisses(inputs: propertyInputs, hits: cacheHits)
+                print("[ValuationRefresh] Cache hits: \(cacheHits.count), misses: \(missedInputs.count)")
+            } catch {
+                print("[ValuationRefresh] Cache lookup failed (will scrape all): \(error.localizedDescription)")
+                missedInputs = propertyInputs
             }
 
-            // Step 2: Scrape only cache misses (or all if force)
+            // Step 2: Scrape only cache misses (let server use its 8-hour cache)
             if !missedInputs.isEmpty {
                 let response = try await ValuationApi.fetchBatchValuation(
                     inputs: missedInputs,
-                    forceRefresh: force
+                    forceRefresh: false
                 )
                 var freshValuations: [String: CachedValuation] = [:]
                 for v in response.valuations {
@@ -243,6 +241,64 @@ class PropertyRepository: ObservableObject {
             valuationState = .failed(error: error, at: Date())
         } catch {
             print("[ValuationRefresh] Failed: \(error)")
+            valuationState = .failed(
+                error: .networkError(error.localizedDescription),
+                at: Date()
+            )
+        }
+    }
+
+    /// Refresh valuation for a single property (used by swipe-to-refresh and after adding a property).
+    /// Merges the result into existing valuations — doesn't wipe other properties.
+    @MainActor
+    func refreshSingleValuation(for input: PropertyInput) async {
+        print("[ValuationRefresh] Refreshing single property: \(input.projectName)")
+        valuationState = .loading(startedAt: Date())
+
+        do {
+            let response = try await ValuationApi.fetchBatchValuation(
+                inputs: [input],
+                forceRefresh: true  // always force for explicit single-property refresh
+            )
+            var freshValuations: [String: CachedValuation] = [:]
+            for v in response.valuations {
+                let cached = CachedValuation(
+                    valueLow: v.valueLow,
+                    valueHigh: v.valueHigh,
+                    fairValue: v.fairValue,
+                    pricePerSqft: v.pricePerSqft,
+                    growth: v.growth,
+                    growthPercent: v.growthPercent,
+                    source: v.source,
+                    confidence: v.confidence,
+                    comparableCount: v.comparableCount,
+                    bhkFiltered: v.bhkFiltered ?? false,
+                    sizeFiltered: v.sizeFiltered ?? false,
+                    filterFallback: v.filterFallback ?? "none",
+                    warnings: v.warnings ?? [],
+                    fetchedAt: Date()
+                )
+                freshValuations[v.projectName] = cached
+                valuations[v.projectName] = cached
+            }
+
+            // Store in shared cache
+            Task {
+                await SupabaseValuationCache.storeResults(
+                    inputs: [input],
+                    valuations: freshValuations
+                )
+            }
+
+            lastValuationRefresh = Date()
+            valuationState = .succeeded(at: Date())
+            saveValuations()
+            print("[ValuationRefresh] Updated valuation for \(input.projectName)")
+        } catch let error as ValuationError {
+            print("[ValuationRefresh] Single refresh failed: \(error.userMessage)")
+            valuationState = .failed(error: error, at: Date())
+        } catch {
+            print("[ValuationRefresh] Single refresh failed: \(error)")
             valuationState = .failed(
                 error: .networkError(error.localizedDescription),
                 at: Date()
