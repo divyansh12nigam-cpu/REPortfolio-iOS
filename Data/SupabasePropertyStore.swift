@@ -7,9 +7,15 @@ enum SupabasePropertyStore {
     // MARK: - Fetch all properties for the current user
 
     static func fetchAll() async throws -> [PropertyInput] {
+        guard let userId = try? await SupabaseManager.client.auth.session.user.id.uuidString else {
+            print("[CloudStore] No authenticated session — returning empty")
+            return []
+        }
+
         let rows: [UserPropertyRow] = try await SupabaseManager.client
             .from("user_properties")
             .select()
+            .eq("user_id", value: userId)
             .order("sort_order")
             .execute()
             .value

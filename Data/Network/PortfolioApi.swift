@@ -37,11 +37,11 @@ enum PortfolioApi {
 enum ValuationApi {
     private static let baseURL = URL(string: "https://valuation-service-m8m9.onrender.com")!
 
-    /// Dedicated session with 120s timeout (reduced from 240s — /wake warms the server separately).
+    /// Dedicated session with generous timeout for Render free tier cold starts + batch scraping.
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 120
-        config.timeoutIntervalForResource = 150
+        config.timeoutIntervalForRequest = 180
+        config.timeoutIntervalForResource = 240
         return URLSession(configuration: config)
     }()
 
@@ -49,7 +49,7 @@ enum ValuationApi {
     static func wake() async {
         let url = baseURL.appendingPathComponent("wake")
         var request = URLRequest(url: url)
-        request.timeoutInterval = 30
+        request.timeoutInterval = 90
         do {
             let (_, response) = try await URLSession.shared.data(for: request)
             if let http = response as? HTTPURLResponse {
@@ -77,7 +77,7 @@ enum ValuationApi {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 120
+        request.timeoutInterval = 180
 
         let body = ValuationBatchRequest(
             properties: inputs.map { p in
