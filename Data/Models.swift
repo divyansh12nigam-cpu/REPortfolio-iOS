@@ -76,9 +76,10 @@ struct PortfolioProperty: Identifiable {
         valuationSource == "fallback" && confidence == "low"
     }
 
-    /// True when the valuation confidence is too low to display (locality fallback, city fallback, etc.)
+    /// True when the valuation is a generic city-average with no real comparable data.
+    /// Only these should be hidden as "Valuation unavailable".
     var isLowConfidenceValuation: Bool {
-        confidence == "low" || isFallbackValuation
+        isFallbackValuation
     }
 }
 

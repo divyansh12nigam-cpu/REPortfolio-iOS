@@ -70,7 +70,14 @@ struct PropertyCardBodyView: View {
             // 3-column stats
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: Spacing.s) {
-                    estValueText
+                    HStack(spacing: Spacing.s) {
+                        estValueText
+                        if !property.isLowConfidenceValuation && property.confidence == "low" {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(.orange)
+                        }
+                    }
                     Text("Est. Value").font(Typography.bodySmall).foregroundColor(.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
