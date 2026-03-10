@@ -86,10 +86,27 @@ enum PropertyUsageType: String, CaseIterable, Codable {
 }
 
 enum FloorPlan: String, CaseIterable, Codable {
+    case studio = "Studio"
+    case bhk1 = "1 BHK"
     case bhk2 = "2 BHK"
     case bhk3 = "3 BHK"
     case bhk4 = "4 BHK"
+    case bhk5Plus = "5+ BHK"
     case other = "Other"
+
+    /// Map a bedroom count (from scraper data) to a FloorPlan case.
+    /// 0 = Studio, 1 = 1 BHK, …, 5+ = 5+ BHK
+    static func fromBedroomCount(_ count: Int) -> FloorPlan? {
+        switch count {
+        case 0: return .studio
+        case 1: return .bhk1
+        case 2: return .bhk2
+        case 3: return .bhk3
+        case 4: return .bhk4
+        case 5...99: return .bhk5Plus
+        default: return nil
+        }
+    }
 }
 
 struct OnboardingFormState {

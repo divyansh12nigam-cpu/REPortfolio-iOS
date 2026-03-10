@@ -14,6 +14,18 @@ struct AddPropertyStep1View: View {
         )
     }
 
+    private var floorPlanOptions: [FloorPlan] {
+        if !formState.societyName.isEmpty,
+           let configs = ProjectDirectoryService.configurationsFor(
+               society: formState.societyName,
+               locality: formState.locality,
+               city: formState.city
+           ) {
+            return configs
+        }
+        return Array(FloorPlan.allCases)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xxxxl) {
             Text("Where is your property located?")
@@ -51,12 +63,23 @@ struct AddPropertyStep1View: View {
                 label: "Apartment / Society",
                 value: $formState.societyName,
                 suggestions: societySuggestions,
-                placeholder: "e.g. ATS Knightsbridge"
+                placeholder: "e.g. ATS Knightsbridge",
+                onSuggestionSelected: { society in
+                    formState.societyName = society
+                    // Reset floor plan if current selection isn't available for new society
+                    if let configs = ProjectDirectoryService.configurationsFor(
+                        society: society,
+                        locality: formState.locality,
+                        city: formState.city
+                    ), let current = formState.floorPlan, !configs.contains(current) {
+                        formState.floorPlan = nil
+                    }
+                }
             )
 
             ChipSelectorView(
                 label: "Select your floor plan",
-                options: FloorPlan.allCases,
+                options: floorPlanOptions,
                 selectedOption: formState.floorPlan,
                 onOptionSelected: { formState.floorPlan = $0 },
                 optionLabel: { $0.rawValue }

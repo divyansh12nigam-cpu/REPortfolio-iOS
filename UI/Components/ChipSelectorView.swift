@@ -13,21 +13,23 @@ struct ChipSelectorView<T: Hashable>: View {
                 .font(Typography.bodyMedium)
                 .foregroundColor(.textPrimary)
 
-            HStack(spacing: Spacing.l) {
-                ForEach(options, id: \.self) { option in
-                    let isSelected = option == selectedOption
-                    Button { onOptionSelected(option) } label: {
-                        Text(optionLabel(option))
-                            .font(Typography.bodyMedium)
-                            .foregroundColor(isSelected ? .surfaceWhite : .textPrimary)
-                            .padding(.horizontal, Spacing.xl)
-                            .padding(.vertical, Spacing.l)
-                            .background(isSelected ? Color.brandPrimary : Color.clear)
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule()
-                                    .stroke(isSelected ? Color.clear : Color.formFieldBorder, lineWidth: 1)
-                            )
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Spacing.l) {
+                    ForEach(options, id: \.self) { option in
+                        let isSelected = option == selectedOption
+                        Button { onOptionSelected(option) } label: {
+                            Text(optionLabel(option))
+                                .font(Typography.bodyMedium)
+                                .foregroundColor(isSelected ? .surfaceWhite : .textPrimary)
+                                .padding(.horizontal, Spacing.xl)
+                                .padding(.vertical, Spacing.l)
+                                .background(isSelected ? Color.brandPrimary : Color.clear)
+                                .clipShape(Capsule())
+                                .overlay(
+                                    Capsule()
+                                        .stroke(isSelected ? Color.clear : Color.formFieldBorder, lineWidth: 1)
+                                )
+                        }
                     }
                 }
             }

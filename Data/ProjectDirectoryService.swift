@@ -12,6 +12,8 @@ enum ProjectDirectoryService {
     private(set) static var localities: [String: [String]] = [:]
     /// "city|locality" (lowercased) → sorted society names
     private(set) static var societies: [String: [String]] = [:]
+    /// "city|locality|society" (lowercased) → available FloorPlan options
+    private(set) static var societyConfigurations: [String: [FloorPlan]] = [:]
 
     /// True after at least one successful fetch.
     private(set) static var isLoaded = false
@@ -50,6 +52,20 @@ enum ProjectDirectoryService {
                 localitySet.insert(row.locality)
                 let key = "\(cityLower)|\(row.locality.lowercased())"
                 societyMap[key, default: []].append(row.societyName)
+
+                // Parse BHK configurations if present
+                if let configStr = row.configurations, !configStr.isEmpty {
+                    let configKey = "\(cityLower)|\(row.locality.lowercased())|\(row.societyName.lowercased())"
+                    let floorPlans = configStr
+                        .split(separator: ",")
+                        .compactMap { Int(String($0).trimmingCharacters(in: .whitespaces)) }
+                        .compactMap { FloorPlan.fromBedroomCount($0) }
+                    if !floorPlans.isEmpty {
+                        var plans = floorPlans
+                        if !plans.contains(.other) { plans.append(.other) }
+                        societyConfigurations[configKey] = plans
+                    }
+                }
             }
 
             // Store sorted
@@ -86,12 +102,20 @@ enum ProjectDirectoryService {
         return LocationData.societiesFor(locality)
     }
 
+    /// Floor plan options for a specific society. Returns nil if no data available
+    /// (caller should fall back to FloorPlan.allCases).
+    static func configurationsFor(society: String, locality: String, city: String) -> [FloorPlan]? {
+        let key = "\(city.lowercased())|\(locality.lowercased())|\(society.lowercased())"
+        return societyConfigurations[key]
+    }
+
     // MARK: - Reset (for testing)
 
     /// Clear the in-memory cache, forcing a re-fetch on next loadDirectory call.
     static func reset() {
         localities = [:]
         societies = [:]
+        societyConfigurations = [:]
         isLoaded = false
     }
 }
@@ -102,9 +126,10 @@ private struct ProjectDirectoryRow: Decodable {
     let city: String
     let locality: String
     let societyName: String
+    let configurations: String?
 
     enum CodingKeys: String, CodingKey {
-        case city, locality
+        case city, locality, configurations
         case societyName = "society_name"
     }
 }
