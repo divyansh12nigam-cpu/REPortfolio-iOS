@@ -61,9 +61,7 @@ enum ProjectDirectoryService {
                         .compactMap { Int(String($0).trimmingCharacters(in: .whitespaces)) }
                         .compactMap { FloorPlan.fromBedroomCount($0) }
                     if !floorPlans.isEmpty {
-                        var plans = floorPlans
-                        if !plans.contains(.other) { plans.append(.other) }
-                        societyConfigurations[configKey] = plans
+                        societyConfigurations[configKey] = floorPlans
                     }
                 }
             }

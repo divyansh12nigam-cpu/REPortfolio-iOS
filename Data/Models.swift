@@ -92,7 +92,6 @@ enum FloorPlan: String, CaseIterable, Codable {
     case bhk3 = "3 BHK"
     case bhk4 = "4 BHK"
     case bhk5Plus = "5+ BHK"
-    case other = "Other"
 
     /// Map a bedroom count (from scraper data) to a FloorPlan case.
     /// 0 = Studio, 1 = 1 BHK, …, 5+ = 5+ BHK
