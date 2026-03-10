@@ -75,6 +75,11 @@ struct PortfolioProperty: Identifiable {
     var isFallbackValuation: Bool {
         valuationSource == "fallback" && confidence == "low"
     }
+
+    /// True when the valuation confidence is too low to display (locality fallback, city fallback, etc.)
+    var isLowConfidenceValuation: Bool {
+        confidence == "low" || isFallbackValuation
+    }
 }
 
 // ─── Onboarding enums + form state ──────────────────────────────────────────

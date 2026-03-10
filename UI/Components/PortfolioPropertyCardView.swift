@@ -70,19 +70,12 @@ struct PropertyCardBodyView: View {
             // 3-column stats
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: Spacing.s) {
-                    HStack(spacing: Spacing.s) {
-                        estValueText
-                        if property.isFallbackValuation {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.system(size: 12))
-                                .foregroundColor(.orange)
-                        }
-                    }
+                    estValueText
                     Text("Est. Value").font(Typography.bodySmall).foregroundColor(.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                StatColumn(label: "Est. Growth",    value: property.estGrowth)
+                StatColumn(label: "Est. Growth",    value: property.isLowConfidenceValuation ? "—" : property.estGrowth)
                 StatColumn(label: "Monthly Rental", value: property.monthlyRental)
             }
             .padding(.horizontal, Spacing.xxxl)
@@ -106,6 +99,13 @@ struct PropertyCardBodyView: View {
         if property.isValuationPending {
             return AnyView(
                 Text("Calculating...")
+                    .font(Typography.bodySmall)
+                    .foregroundColor(.textSecondary)
+            )
+        }
+        if property.isLowConfidenceValuation {
+            return AnyView(
+                Text("Valuation unavailable")
                     .font(Typography.bodySmall)
                     .foregroundColor(.textSecondary)
             )

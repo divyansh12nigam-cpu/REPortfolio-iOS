@@ -322,7 +322,7 @@ class PropertyRepository: ObservableObject {
 
             lastValuationRefresh = Date()
             if cardRefresh { refreshingProperties.remove(input.projectName) }
-            lastRefreshContext = .singleProperty(name: input.projectName)
+            if cardRefresh { lastRefreshContext = .singleProperty(name: input.projectName) }
             valuationState = .succeeded(at: Date())
             saveValuations()
             print("[ValuationRefresh] Updated valuation for \(input.projectName)")

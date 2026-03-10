@@ -238,10 +238,17 @@ enum SamplePortfolioData {
         realValuations: [String: CachedValuation]? = nil
     ) -> PortfolioSummary {
         let vals = valuations(for: inputs, realValuations: realValuations)
+        // Exclude low-confidence valuations (locality/city fallback) from totals
+        let reliableVals = vals.filter { v in
+            if v.confidence == "low" { return false }
+            if v.valuationSource == "fallback" { return false }
+            return true
+        }
         let totalInvested = Double(inputs.reduce(0) { $0 + $1.purchasePrice })
-        let totalHighValue = vals.reduce(0.0) { $0 + Formatters.roundToDisplayPrecision($1.highValue) }
-        let totalGrowth = totalHighValue - totalInvested
-        let growthPercent = totalInvested > 0 ? (totalGrowth / totalInvested) * 100 : 0.0
+        let totalHighValue = reliableVals.reduce(0.0) { $0 + Formatters.roundToDisplayPrecision($1.highValue) }
+        let reliableInvested = reliableVals.reduce(0.0) { $0 + Double($1.input.purchasePrice) }
+        let totalGrowth = totalHighValue - reliableInvested
+        let growthPercent = reliableInvested > 0 ? (totalGrowth / reliableInvested) * 100 : 0.0
         let totalAnnualRental = Double(inputs.reduce(0) { $0 + $1.monthlyRent * 12 })
 
         return PortfolioSummary(
