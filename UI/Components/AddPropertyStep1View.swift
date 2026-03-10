@@ -4,11 +4,14 @@ struct AddPropertyStep1View: View {
     @Binding var formState: OnboardingFormState
 
     private var localitySuggestions: [String] {
-        LocationData.localitiesFor(formState.city)
+        ProjectDirectoryService.localitiesFor(formState.city)
     }
 
     private var societySuggestions: [String] {
-        LocationData.societiesFor(formState.locality)
+        ProjectDirectoryService.societiesFor(
+            locality: formState.locality,
+            city: formState.city
+        )
     }
 
     var body: some View {
@@ -25,6 +28,11 @@ struct AddPropertyStep1View: View {
                 onSuggestionSelected: { city in
                     formState.city = city
                     formState.locality = ""
+                    formState.societyName = ""
+                    // Load dynamic directory for the selected city
+                    Task {
+                        await ProjectDirectoryService.loadDirectory(for: city)
+                    }
                 }
             )
 
@@ -32,14 +40,18 @@ struct AddPropertyStep1View: View {
                 label: "Locality",
                 value: $formState.locality,
                 suggestions: localitySuggestions,
-                placeholder: "e.g. Raj Nagar Extension"
+                placeholder: "e.g. Sector 150",
+                onSuggestionSelected: { locality in
+                    formState.locality = locality
+                    formState.societyName = ""  // Reset society when locality changes
+                }
             )
 
             AutoSuggestTextFieldView(
                 label: "Apartment / Society",
                 value: $formState.societyName,
                 suggestions: societySuggestions,
-                placeholder: "e.g. ATS Pious Headaways"
+                placeholder: "e.g. ATS Knightsbridge"
             )
 
             ChipSelectorView(
@@ -61,5 +73,11 @@ struct AddPropertyStep1View: View {
         }
         .padding(.horizontal, Spacing.xxxl)
         .padding(.top, Spacing.widgetsXs)
+        .task {
+            // Pre-load directory for current city (covers edit mode)
+            if !formState.city.isEmpty {
+                await ProjectDirectoryService.loadDirectory(for: formState.city)
+            }
+        }
     }
 }

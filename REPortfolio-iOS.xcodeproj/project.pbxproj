@@ -10,6 +10,7 @@
 		033D11D128B690AF226383B1 /* SupabasePropertyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7048FF1DB6A6C486999DF980 /* SupabasePropertyStore.swift */; };
 		065CD8990414D561C4E0844C /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047237E7379027C4E13950DE /* AuthManager.swift */; };
 		183D966FE3C53317DE1E20A0 /* PropertyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */; };
+		1A2B3C4D5E6F7A8B9C0D1E2F /* ProjectDirectoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* ProjectDirectoryService.swift */; };
 		1B498C8356F9C6CE6165B282 /* AddPropertyStep2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E7E8E482E35D91EDAF108F /* AddPropertyStep2View.swift */; };
 		1D4D4F9D5AB570398DB27B70 /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850D515E3825BBE653888A19 /* SupabaseClient.swift */; };
 		229D2FE8DCEFE218B969877C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 7A1356C1339054F719DB81F5 /* Supabase */; };
@@ -75,6 +76,7 @@
 		49F2C13EA9AAA9CD6D191A7E /* PortfolioSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioSummaryView.swift; sourceTree = "<group>"; };
 		4F36EE6E0040DB4FD8546998 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyRepository.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* ProjectDirectoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDirectoryService.swift; sourceTree = "<group>"; };
 		596A688EE76D60D72F693960 /* ValuationApiModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuationApiModels.swift; sourceTree = "<group>"; };
 		5F40E0D9C91F87081776D809 /* FormTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormTextFieldView.swift; sourceTree = "<group>"; };
 		65F39BD6C71F8AC57A439EBF /* PortfolioPageHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPageHeaderView.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 				047237E7379027C4E13950DE /* AuthManager.swift */,
 				E899272FF3565F33FA8C8DA2 /* LocationData.swift */,
 				C35A1CC79014D070617BB651 /* Models.swift */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* ProjectDirectoryService.swift */,
 				4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */,
 				E930C63B931614A7B8C84A3F /* SampleData.swift */,
 				7048FF1DB6A6C486999DF980 /* SupabasePropertyStore.swift */,
@@ -321,6 +324,7 @@
 				B3F02EF95F0C1CC52BC58C40 /* PropertyDetailBottomBarView.swift in Sources */,
 				97988411B8087FA60AB4EB4A /* PropertyDetailView.swift in Sources */,
 				8EF614BC7EA8B727A12724A5 /* PropertyPreviewCardView.swift in Sources */,
+				1A2B3C4D5E6F7A8B9C0D1E2F /* ProjectDirectoryService.swift in Sources */,
 				183D966FE3C53317DE1E20A0 /* PropertyRepository.swift in Sources */,
 				AC98FC134989E6B10494E6F3 /* PropertySummaryHeroView.swift in Sources */,
 				602C5AA5C33A3CC65625D1E6 /* REPortfolioApp.swift in Sources */,
