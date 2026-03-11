@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AddPropertyStep1View: View {
     @Binding var formState: OnboardingFormState
+    var scrollProxy: ScrollViewProxy? = nil
 
     private var localitySuggestions: [String] {
         ProjectDirectoryService.localitiesFor(formState.city)
@@ -76,8 +77,11 @@ struct AddPropertyStep1View: View {
                     ), let current = formState.floorPlan, !configs.contains(current) {
                         formState.floorPlan = nil
                     }
-                }
+                },
+                scrollProxy: scrollProxy,
+                scrollId: "field-society"
             )
+            .id("field-society")
 
             AutoSuggestTextFieldView(
                 label: "Locality",
@@ -86,8 +90,11 @@ struct AddPropertyStep1View: View {
                 placeholder: "e.g. Sector 150",
                 onSuggestionSelected: { locality in
                     formState.locality = locality
-                }
+                },
+                scrollProxy: scrollProxy,
+                scrollId: "field-locality"
             )
+            .id("field-locality")
 
             ChipSelectorView(
                 label: "Select your floor plan",

@@ -32,6 +32,7 @@ struct AddPropertyScreen: View {
         } else {
             ZStack(alignment: .top) {
                 VStack(spacing: 0) {
+                    ScrollViewReader { scrollProxy in
                     ScrollView {
                         VStack(spacing: 0) {
                             StepProgressHeaderView(
@@ -44,7 +45,7 @@ struct AddPropertyScreen: View {
                             )
 
                             if currentStep == 1 {
-                                AddPropertyStep1View(formState: $formState)
+                                AddPropertyStep1View(formState: $formState, scrollProxy: scrollProxy)
                             } else {
                                 AddPropertyStep2View(
                                     formState: $formState,
@@ -52,6 +53,8 @@ struct AddPropertyScreen: View {
                                 )
                             }
                         }
+                    }
+                    .scrollDismissesKeyboard(.interactively)
                     }
 
                     // Bottom CTA

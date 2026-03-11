@@ -7,6 +7,8 @@ struct AutoSuggestTextFieldView: View {
     let suggestions: [String]
     var placeholder: String = ""
     var onSuggestionSelected: ((String) -> Void)? = nil
+    var scrollProxy: ScrollViewProxy? = nil
+    var scrollId: String? = nil
 
     @FocusState private var isFocused: Bool
 
@@ -44,6 +46,13 @@ struct AutoSuggestTextFieldView: View {
                         : Radius.sm)
                 )
                 .padding(.top, Spacing.l)
+
+            .onChange(of: isFocused) { focused in
+                guard focused, let id = scrollId, let proxy = scrollProxy else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    withAnimation { proxy.scrollTo(id, anchor: .top) }
+                }
+            }
 
             if showDropdown {
                 ScrollView {
