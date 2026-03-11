@@ -8,10 +8,7 @@ struct AddPropertyStep1View: View {
     }
 
     private var societySuggestions: [String] {
-        ProjectDirectoryService.societiesFor(
-            locality: formState.locality,
-            city: formState.city
-        )
+        ProjectDirectoryService.allSocietiesFor(city: formState.city)
     }
 
     private var floorPlanOptions: [FloorPlan] {
@@ -49,23 +46,16 @@ struct AddPropertyStep1View: View {
             )
 
             AutoSuggestTextFieldView(
-                label: "Locality",
-                value: $formState.locality,
-                suggestions: localitySuggestions,
-                placeholder: "e.g. Sector 150",
-                onSuggestionSelected: { locality in
-                    formState.locality = locality
-                    formState.societyName = ""  // Reset society when locality changes
-                }
-            )
-
-            AutoSuggestTextFieldView(
                 label: "Apartment / Society",
                 value: $formState.societyName,
                 suggestions: societySuggestions,
                 placeholder: "e.g. ATS Knightsbridge",
                 onSuggestionSelected: { society in
                     formState.societyName = society
+                    // Auto-fill locality from reverse lookup
+                    if let loc = ProjectDirectoryService.localityFor(society: society, city: formState.city) {
+                        formState.locality = loc
+                    }
                     // Reset floor plan if current selection isn't available for new society
                     if let configs = ProjectDirectoryService.configurationsFor(
                         society: society,
@@ -74,6 +64,16 @@ struct AddPropertyStep1View: View {
                     ), let current = formState.floorPlan, !configs.contains(current) {
                         formState.floorPlan = nil
                     }
+                }
+            )
+
+            AutoSuggestTextFieldView(
+                label: "Locality",
+                value: $formState.locality,
+                suggestions: localitySuggestions,
+                placeholder: "e.g. Sector 150",
+                onSuggestionSelected: { locality in
+                    formState.locality = locality
                 }
             )
 

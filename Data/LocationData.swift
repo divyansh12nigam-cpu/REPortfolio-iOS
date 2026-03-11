@@ -58,4 +58,25 @@ enum LocationData {
     static func societiesFor(_ locality: String) -> [String] {
         societies.first { $0.key.caseInsensitiveCompare(locality) == .orderedSame }?.value ?? []
     }
+
+    /// All societies across all localities for a city (flattened, sorted, deduplicated).
+    static func allSocietiesFor(_ city: String) -> [String] {
+        var all = Set<String>()
+        for locality in localitiesFor(city) {
+            for society in societiesFor(locality) {
+                all.insert(society)
+            }
+        }
+        return all.sorted()
+    }
+
+    /// Reverse lookup: find which locality a society belongs to in a given city.
+    static func localityFor(society: String, city: String) -> String? {
+        for locality in localitiesFor(city) {
+            if societiesFor(locality).contains(where: { $0.caseInsensitiveCompare(society) == .orderedSame }) {
+                return locality
+            }
+        }
+        return nil
+    }
 }

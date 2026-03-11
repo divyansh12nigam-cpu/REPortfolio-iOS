@@ -14,6 +14,10 @@ enum ProjectDirectoryService {
     private(set) static var societies: [String: [String]] = [:]
     /// "city|locality|society" (lowercased) → available FloorPlan options
     private(set) static var societyConfigurations: [String: [FloorPlan]] = [:]
+    /// city (lowercased) → ALL society names across all localities (flat, sorted, deduplicated)
+    private(set) static var allCitySocieties: [String: [String]] = [:]
+    /// "city|society" (lowercased) → locality (original case) for reverse lookup
+    private(set) static var societyLocality: [String: String] = [:]
 
     /// True after at least one successful fetch.
     private(set) static var isLoaded = false
@@ -47,11 +51,19 @@ enum ProjectDirectoryService {
             // Build locality list (unique, sorted)
             var localitySet = Set<String>()
             var societyMap: [String: [String]] = [:]
+            var allSocietySet = Set<String>()
 
             for row in rows {
                 localitySet.insert(row.locality)
                 let key = "\(cityLower)|\(row.locality.lowercased())"
                 societyMap[key, default: []].append(row.societyName)
+
+                // Build city-wide society list + reverse lookup
+                allSocietySet.insert(row.societyName)
+                let reverseKey = "\(cityLower)|\(row.societyName.lowercased())"
+                if societyLocality[reverseKey] == nil {
+                    societyLocality[reverseKey] = row.locality
+                }
 
                 // Parse BHK configurations if present
                 if let configStr = row.configurations, !configStr.isEmpty {
@@ -72,6 +84,7 @@ enum ProjectDirectoryService {
                 // Deduplicate and sort
                 societies[key] = Array(Set(names)).sorted()
             }
+            allCitySocieties[cityLower] = allSocietySet.sorted()
 
             isLoaded = true
             print("[ProjectDirectory] Loaded \(localitySet.count) localities, \(rows.count) societies for \(city)")
@@ -107,6 +120,24 @@ enum ProjectDirectoryService {
         return societyConfigurations[key]
     }
 
+    /// All societies for a city across all localities. Falls back to LocationData.
+    static func allSocietiesFor(city: String) -> [String] {
+        let key = city.lowercased()
+        if let dynamic = allCitySocieties[key], !dynamic.isEmpty {
+            return dynamic
+        }
+        return LocationData.allSocietiesFor(city)
+    }
+
+    /// Reverse lookup: locality for a given society in a city. Returns nil if unknown.
+    static func localityFor(society: String, city: String) -> String? {
+        let key = "\(city.lowercased())|\(society.lowercased())"
+        if let locality = societyLocality[key] {
+            return locality
+        }
+        return LocationData.localityFor(society: society, city: city)
+    }
+
     // MARK: - Reset (for testing)
 
     /// Clear the in-memory cache, forcing a re-fetch on next loadDirectory call.
@@ -114,6 +145,8 @@ enum ProjectDirectoryService {
         localities = [:]
         societies = [:]
         societyConfigurations = [:]
+        allCitySocieties = [:]
+        societyLocality = [:]
         isLoaded = false
     }
 }
