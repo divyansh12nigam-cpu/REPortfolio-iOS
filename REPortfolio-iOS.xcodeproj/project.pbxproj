@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		033D11D128B690AF226383B1 /* SupabasePropertyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7048FF1DB6A6C486999DF980 /* SupabasePropertyStore.swift */; };
+		04A1B2C3D4E5F6A7B8C9D0E1 /* AreaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3E4F5A6B7C8D9E0F1 /* AreaData.swift */; };
 		065CD8990414D561C4E0844C /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047237E7379027C4E13950DE /* AuthManager.swift */; };
 		183D966FE3C53317DE1E20A0 /* PropertyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDCE9EECC55691F2FFD0B42 /* PropertyRepository.swift */; };
 		1A2B3C4D5E6F7A8B9C0D1E2F /* ProjectDirectoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* ProjectDirectoryService.swift */; };
@@ -58,6 +59,7 @@
 
 /* Begin PBXFileReference section */
 		047237E7379027C4E13950DE /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		A0B1C2D3E4F5A6B7C8D9E0F1 /* AreaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AreaData.swift; sourceTree = "<group>"; };
 		09D099757DA068BFDC08007C /* PropertyPreviewCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyPreviewCardView.swift; sourceTree = "<group>"; };
 		0D6172DF5E8535BB97234FF5 /* PortfolioApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioApi.swift; sourceTree = "<group>"; };
 		1C9C241D014A3D03EF67DF15 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 		33F915403B2E69BEE6F8EBCE /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				A0B1C2D3E4F5A6B7C8D9E0F1 /* AreaData.swift */,
 				047237E7379027C4E13950DE /* AuthManager.swift */,
 				E899272FF3565F33FA8C8DA2 /* LocationData.swift */,
 				C35A1CC79014D070617BB651 /* Models.swift */,
@@ -300,6 +303,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				897DD301804CF7ED460EF2AE /* AddPropertyScreen.swift in Sources */,
+				04A1B2C3D4E5F6A7B8C9D0E1 /* AreaData.swift in Sources */,
 				97565A3CE28AF70F93B2EE8B /* AddPropertyStep1View.swift in Sources */,
 				1B498C8356F9C6CE6165B282 /* AddPropertyStep2View.swift in Sources */,
 				CBD673464BAAD7FB0285E65D /* ApiModels.swift in Sources */,

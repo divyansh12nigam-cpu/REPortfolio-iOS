@@ -16,8 +16,11 @@ enum ProjectDirectoryService {
     private(set) static var societyConfigurations: [String: [FloorPlan]] = [:]
     /// city (lowercased) → ALL society names across all localities (flat, sorted, deduplicated)
     private(set) static var allCitySocieties: [String: [String]] = [:]
-    /// "city|society" (lowercased) → locality (original case) for reverse lookup
-    private(set) static var societyLocality: [String: String] = [:]
+    /// "city|society" (lowercased) → localities (original case) for reverse lookup
+    /// A society may appear in multiple localities (e.g. "The Golden Palm" in Sector 153 & 168).
+    private(set) static var societyLocality: [String: [String]] = [:]
+    /// "city|society" (lowercased) → area sizes per floor plan label ("2 BHK" → [1050, 1225])
+    private(set) static var societyAreaSizes: [String: [String: [Int]]] = [:]
 
     /// True after at least one successful fetch.
     private(set) static var isLoaded = false
@@ -61,9 +64,7 @@ enum ProjectDirectoryService {
                 // Build city-wide society list + reverse lookup
                 allSocietySet.insert(row.societyName)
                 let reverseKey = "\(cityLower)|\(row.societyName.lowercased())"
-                if societyLocality[reverseKey] == nil {
-                    societyLocality[reverseKey] = row.locality
-                }
+                societyLocality[reverseKey, default: []].append(row.locality)
 
                 // Parse BHK configurations if present
                 if let configStr = row.configurations, !configStr.isEmpty {
@@ -76,6 +77,12 @@ enum ProjectDirectoryService {
                         societyConfigurations[configKey] = floorPlans
                     }
                 }
+
+                // Cache area sizes from Supabase (keyed by city|society)
+                if let areas = row.areaSizes, !areas.isEmpty {
+                    let areaKey = "\(cityLower)|\(row.societyName.lowercased())"
+                    societyAreaSizes[areaKey] = areas
+                }
             }
 
             // Store sorted
@@ -85,6 +92,12 @@ enum ProjectDirectoryService {
                 societies[key] = Array(Set(names)).sorted()
             }
             allCitySocieties[cityLower] = allSocietySet.sorted()
+
+            // Deduplicate locality arrays in reverse lookup (preserve insertion order)
+            for (key, locs) in societyLocality {
+                var seen = Set<String>()
+                societyLocality[key] = locs.filter { seen.insert($0).inserted }
+            }
 
             isLoaded = true
             print("[ProjectDirectory] Loaded \(localitySet.count) localities, \(rows.count) societies for \(city)")
@@ -115,9 +128,22 @@ enum ProjectDirectoryService {
 
     /// Floor plan options for a specific society. Returns nil if no data available
     /// (caller should fall back to FloorPlan.allCases).
+    /// When locality is empty, searches across all localities for a match.
     static func configurationsFor(society: String, locality: String, city: String) -> [FloorPlan]? {
-        let key = "\(city.lowercased())|\(locality.lowercased())|\(society.lowercased())"
-        return societyConfigurations[key]
+        let cityLower = city.lowercased()
+        let societyLower = society.lowercased()
+
+        if !locality.isEmpty {
+            let key = "\(cityLower)|\(locality.lowercased())|\(societyLower)"
+            if let configs = societyConfigurations[key] { return configs }
+        }
+
+        // Fallback: search across all localities for this society
+        let suffix = "|\(societyLower)"
+        for (key, configs) in societyConfigurations where key.hasPrefix(cityLower) && key.hasSuffix(suffix) {
+            return configs
+        }
+        return nil
     }
 
     /// All societies for a city across all localities. Falls back to LocationData.
@@ -129,11 +155,23 @@ enum ProjectDirectoryService {
         return LocationData.allSocietiesFor(city)
     }
 
-    /// Reverse lookup: locality for a given society in a city. Returns nil if unknown.
+    /// Area sizes for a given society + floor plan. Checks Supabase cache first, falls back to hardcoded AreaData.
+    static func areasFor(society: String, floorPlan: FloorPlan, city: String) -> [Int]? {
+        let key = "\(city.lowercased())|\(society.lowercased())"
+        if let areaMap = societyAreaSizes[key],
+           let areas = areaMap[floorPlan.rawValue], !areas.isEmpty {
+            return areas
+        }
+        return AreaData.areasFor(society: society, floorPlan: floorPlan)
+    }
+
+    /// Reverse lookup: locality for a given society in a city.
+    /// When a society exists in multiple localities, returns the first one
+    /// (user can override manually in the locality field).
     static func localityFor(society: String, city: String) -> String? {
         let key = "\(city.lowercased())|\(society.lowercased())"
-        if let locality = societyLocality[key] {
-            return locality
+        if let locs = societyLocality[key], let first = locs.first {
+            return first
         }
         return LocationData.localityFor(society: society, city: city)
     }
@@ -147,6 +185,7 @@ enum ProjectDirectoryService {
         societyConfigurations = [:]
         allCitySocieties = [:]
         societyLocality = [:]
+        societyAreaSizes = [:]
         isLoaded = false
     }
 }
@@ -158,9 +197,11 @@ private struct ProjectDirectoryRow: Decodable {
     let locality: String
     let societyName: String
     let configurations: String?
+    let areaSizes: [String: [Int]]?
 
     enum CodingKeys: String, CodingKey {
         case city, locality, configurations
         case societyName = "society_name"
+        case areaSizes = "area_sizes"
     }
 }

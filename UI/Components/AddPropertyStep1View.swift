@@ -11,6 +11,17 @@ struct AddPropertyStep1View: View {
         ProjectDirectoryService.allSocietiesFor(city: formState.city)
     }
 
+    private var areaOptions: [Int] {
+        guard !formState.societyName.isEmpty,
+              let fp = formState.floorPlan,
+              let areas = ProjectDirectoryService.areasFor(
+                  society: formState.societyName,
+                  floorPlan: fp,
+                  city: formState.city
+              ) else { return [] }
+        return areas
+    }
+
     private var floorPlanOptions: [FloorPlan] {
         if !formState.societyName.isEmpty,
            let configs = ProjectDirectoryService.configurationsFor(
@@ -52,6 +63,7 @@ struct AddPropertyStep1View: View {
                 placeholder: "e.g. ATS Knightsbridge",
                 onSuggestionSelected: { society in
                     formState.societyName = society
+                    formState.areaSqft = ""  // Reset area when society changes
                     // Auto-fill locality from reverse lookup
                     if let loc = ProjectDirectoryService.localityFor(society: society, city: formState.city) {
                         formState.locality = loc
@@ -81,12 +93,25 @@ struct AddPropertyStep1View: View {
                 label: "Select your floor plan",
                 options: floorPlanOptions,
                 selectedOption: formState.floorPlan,
-                onOptionSelected: { formState.floorPlan = $0 },
+                onOptionSelected: {
+                    formState.floorPlan = $0
+                    formState.areaSqft = ""  // Reset area when BHK changes
+                },
                 optionLabel: { $0.rawValue }
             )
 
+            if !areaOptions.isEmpty {
+                ChipSelectorView(
+                    label: "Select area (sq.ft)",
+                    options: areaOptions,
+                    selectedOption: Int(formState.areaSqft),
+                    onOptionSelected: { formState.areaSqft = String($0) },
+                    optionLabel: { "\($0) sq.ft" }
+                )
+            }
+
             FormTextFieldView(
-                label: "Area (sq.ft)",
+                label: areaOptions.isEmpty ? "Area (sq.ft)" : "Or enter area manually",
                 value: $formState.areaSqft,
                 placeholder: "e.g. 1370",
                 keyboardType: .numberPad
