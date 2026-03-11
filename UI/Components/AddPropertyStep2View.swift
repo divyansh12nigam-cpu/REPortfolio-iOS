@@ -43,14 +43,25 @@ struct AddPropertyStep2View: View {
 
             if formState.usageType != nil {
                 VStack(alignment: .leading, spacing: Spacing.xxxxl) {
-                    FormTextFieldView(
-                        label: "What price did you buy this property for?",
-                        value: $formState.purchasePrice,
-                        placeholder: "Invested value",
-                        prefix: "₹",
-                        keyboardType: .numberPad,
-                        isFocused: $purchasePriceIsFocused
-                    )
+                    VStack(alignment: .leading, spacing: Spacing.s) {
+                        FormTextFieldView(
+                            label: "What price did you buy this property for?",
+                            value: $formState.purchasePrice,
+                            placeholder: "Invested value",
+                            prefix: "₹",
+                            keyboardType: .numberPad,
+                            isFocused: $purchasePriceIsFocused
+                        )
+
+                        if let words = Formatters.numberToWords(
+                            Int64(formState.purchasePrice.replacingOccurrences(of: ",", with: "")) ?? 0
+                        ) {
+                            Text(words)
+                                .font(Typography.bodySmall)
+                                .foregroundColor(.textSecondary)
+                                .padding(.leading, Spacing.xs)
+                        }
+                    }
 
                     FormTextFieldView(
                         label: "When did you buy this property?",
