@@ -38,7 +38,8 @@ struct PortfolioSummaryView: View {
     private var properties: [PortfolioProperty] {
         apiProperties ?? SamplePortfolioData.properties(
             for: repository.propertyInputs,
-            newCount: repository.addedCount,
+            newCount: repository.sessionNewCount,
+            userAddedCount: repository.addedCount,
             realValuations: realValuations,
             valuationState: repository.valuationState,
             refreshingProperties: repository.refreshingProperties

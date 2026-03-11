@@ -178,6 +178,7 @@ enum SamplePortfolioData {
     static func properties(
         for inputs: [PropertyInput],
         newCount: Int = 0,
+        userAddedCount: Int = 0,
         realValuations: [String: CachedValuation]? = nil,
         valuationState: ValuationState = .idle,
         refreshingProperties: Set<String> = []
@@ -185,6 +186,7 @@ enum SamplePortfolioData {
         let strips = assignInsightStrips(for: inputs)
         return valuations(for: inputs, realValuations: realValuations).enumerated().map { i, v in
             let isNew = i < newCount
+            let isUserAdded = i < userAddedCount
             let hasRealValuation = realValuations?[v.input.projectName] != nil
             let isPending: Bool
             if refreshingProperties.contains(v.input.projectName) {
@@ -193,7 +195,7 @@ enum SamplePortfolioData {
             } else {
                 switch valuationState {
                 case .idle, .loading:
-                    isPending = isNew && !hasRealValuation
+                    isPending = isUserAdded && !hasRealValuation
                 case .succeeded, .failed:
                     isPending = false
                 }

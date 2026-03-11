@@ -18,6 +18,8 @@ class PropertyRepository: ObservableObject {
     @Published var propertyInputs: [PropertyInput]
     /// Number of user-added properties (inserted at the front of the list).
     @Published private(set) var addedCount: Int = 0
+    /// Session-only "New" badge count (at most 1, resets on app relaunch).
+    @Published private(set) var sessionNewCount: Int = 0
 
     // ─── Valuation cache (from 99acres valuation service) ────────────────────
     @Published var valuations: [String: CachedValuation] = [:]
@@ -68,6 +70,7 @@ class PropertyRepository: ObservableObject {
     func addProperty(_ input: PropertyInput) {
         propertyInputs.insert(input, at: 0)
         addedCount += 1
+        sessionNewCount = 1   // only most-recent property is "New"
         save()
         syncToCloud()
     }
@@ -76,6 +79,7 @@ class PropertyRepository: ObservableObject {
         guard propertyInputs.indices.contains(index) else { return }
         let removed = propertyInputs.remove(at: index)
         if index < addedCount { addedCount -= 1 }
+        if index < sessionNewCount { sessionNewCount = 0 }
         valuations.removeValue(forKey: removed.projectName)
         save()
         saveValuations()

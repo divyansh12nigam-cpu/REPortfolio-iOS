@@ -19,8 +19,8 @@ enum ProjectDirectoryService {
     /// "city|society" (lowercased) → localities (original case) for reverse lookup
     /// A society may appear in multiple localities (e.g. "The Golden Palm" in Sector 153 & 168).
     private(set) static var societyLocality: [String: [String]] = [:]
-    /// "city|society" (lowercased) → area sizes per floor plan label ("2 BHK" → [1050, 1225])
-    private(set) static var societyAreaSizes: [String: [String: [Int]]] = [:]
+    /// "city|locality|society" (lowercased) → per-BHK area sizes {"2": [831, 1050], "3": [978]}
+    private(set) static var societyAreas: [String: [String: [Int]]] = [:]
 
     /// True after at least one successful fetch.
     private(set) static var isLoaded = false
@@ -78,10 +78,10 @@ enum ProjectDirectoryService {
                     }
                 }
 
-                // Cache area sizes from Supabase (keyed by city|society)
-                if let areas = row.areaSizes, !areas.isEmpty {
-                    let areaKey = "\(cityLower)|\(row.societyName.lowercased())"
-                    societyAreaSizes[areaKey] = areas
+                // Cache per-BHK area sizes from Supabase
+                if let details = row.configDetails, !details.isEmpty {
+                    let areaKey = "\(cityLower)|\(row.locality.lowercased())|\(row.societyName.lowercased())"
+                    societyAreas[areaKey] = details
                 }
             }
 
@@ -157,11 +157,28 @@ enum ProjectDirectoryService {
 
     /// Area sizes for a given society + floor plan. Checks Supabase cache first, falls back to hardcoded AreaData.
     static func areasFor(society: String, floorPlan: FloorPlan, city: String) -> [Int]? {
-        let key = "\(city.lowercased())|\(society.lowercased())"
-        if let areaMap = societyAreaSizes[key],
-           let areas = areaMap[floorPlan.rawValue], !areas.isEmpty {
-            return areas
+        let cityLower = city.lowercased()
+        let societyLower = society.lowercased()
+
+        // Derive bedroom count key from FloorPlan
+        let bhkKey: String = switch floorPlan {
+            case .studio: "0"
+            case .bhk1: "1"
+            case .bhk2: "2"
+            case .bhk3: "3"
+            case .bhk4: "4"
+            case .bhk5Plus: "5"
         }
+
+        // Search across all localities for this society's area data
+        let suffix = "|\(societyLower)"
+        for (key, details) in societyAreas where key.hasPrefix(cityLower) && key.hasSuffix(suffix) {
+            if let areas = details[bhkKey], !areas.isEmpty {
+                return areas
+            }
+        }
+
+        // Fallback: hardcoded AreaData
         return AreaData.areasFor(society: society, floorPlan: floorPlan)
     }
 
@@ -185,7 +202,7 @@ enum ProjectDirectoryService {
         societyConfigurations = [:]
         allCitySocieties = [:]
         societyLocality = [:]
-        societyAreaSizes = [:]
+        societyAreas = [:]
         isLoaded = false
     }
 }
@@ -197,11 +214,11 @@ private struct ProjectDirectoryRow: Decodable {
     let locality: String
     let societyName: String
     let configurations: String?
-    let areaSizes: [String: [Int]]?
+    let configDetails: [String: [Int]]?
 
     enum CodingKeys: String, CodingKey {
         case city, locality, configurations
         case societyName = "society_name"
-        case areaSizes = "area_sizes"
+        case configDetails = "config_details"
     }
 }
